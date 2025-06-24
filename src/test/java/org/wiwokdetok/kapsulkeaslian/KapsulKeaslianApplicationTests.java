@@ -8,5 +8,6 @@ class KapsulKeaslianApplicationTests {
 
     @Test
     void contextLoads() {
+        KapsulKeaslianApplication.main(new String[]{});
     }
 }
