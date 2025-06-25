@@ -12,16 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get the commit SHA from triggering workflow
-        id: get-sha
-        uses: actions/github-script@v7
-        with:
-          script: return github.event.workflow_run.head_sha;
-
       - name: Check out the exact commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.get-sha.outputs.result }}
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Set up Java toolchain
         uses: actions/setup-java@v4
