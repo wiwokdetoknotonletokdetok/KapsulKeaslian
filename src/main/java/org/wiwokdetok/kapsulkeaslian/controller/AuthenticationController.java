@@ -55,9 +55,9 @@ public class AuthenticationController {
     public ResponseEntity<WebResponse<String>> register(
             @Valid @RequestBody RegisterUserRequest request) {
 
-        authenticationService.validatePasswordConfirm(request.getPassword(), request.getConfirmPassword());
-
         authenticationService.checkEmailExists(request.getEmail());
+
+        authenticationService.validatePasswordConfirm(request.getPassword(), request.getConfirmPassword());
 
         authenticationService.registerUser(request);
 
