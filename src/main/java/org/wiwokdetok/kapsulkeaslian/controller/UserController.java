@@ -47,6 +47,12 @@ public class UserController {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
+        if (!user.getEmail().equals(request.getEmail())) {
+            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email sudah terdaftar");
+            }
+        }
+
         Optional.ofNullable(request.getEmail())
                 .ifPresent(user::setEmail);
 
