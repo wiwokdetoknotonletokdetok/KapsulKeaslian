@@ -44,8 +44,10 @@ jobs:
             docker run -d \
               --name kapsulkeaslian \
               -p 8080:8080 \
-              -e SPRING_DATASOURCE_URL=jdbc:postgresql://${{ DB_HOST }}:${{ DB_PORT }}/${{ DB_NAME }} \
-              -e SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_NAME=${{ secrets.DB_NAME }} \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_HOST=${{ secrets.DB_HOST }} \
+              -e DB_PORT=${{ secrets.DB_PORT }} \
               -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
               kapsulkeaslian:latest
