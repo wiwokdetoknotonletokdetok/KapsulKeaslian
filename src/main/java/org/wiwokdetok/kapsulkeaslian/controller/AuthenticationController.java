@@ -51,7 +51,7 @@ public class AuthenticationController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username atau password tidak valid");
         }
 
-        String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getEmail(), user.getRole());
+        String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRole());
 
         LoginUserResponse loginUserResponse = new LoginUserResponse();
         loginUserResponse.setToken(token);

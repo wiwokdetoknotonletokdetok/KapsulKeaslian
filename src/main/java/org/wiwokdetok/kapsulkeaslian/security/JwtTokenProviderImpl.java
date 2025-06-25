@@ -25,11 +25,10 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String id, String email, String role) {
+    public String generateToken(String id, String role) {
         long expiration = 1000 * 60 * 60;
         return Jwts.builder()
                 .setSubject(id)
-                .claim("email", email)
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
@@ -40,11 +39,6 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
     public String extractId(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token).getBody().getSubject();
-    }
-
-    public String extractEmail(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token).getBody().get("email", String.class);
     }
 
     public String extractRole(String token) {
