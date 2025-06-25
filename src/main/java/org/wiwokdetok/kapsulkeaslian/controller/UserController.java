@@ -2,7 +2,6 @@ package org.wiwokdetok.kapsulkeaslian.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,26 +10,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import org.wiwokdetok.kapsulkeaslian.entity.User;
 import org.wiwokdetok.kapsulkeaslian.model.UpdateUserRequest;
 import org.wiwokdetok.kapsulkeaslian.model.UserProfileResponse;
 import org.wiwokdetok.kapsulkeaslian.model.WebResponse;
-import org.wiwokdetok.kapsulkeaslian.repository.UserRepository;
-import org.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
 import org.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles;
-
-import java.util.Optional;
-import java.util.UUID;
+import org.wiwokdetok.kapsulkeaslian.service.AuthenticationService;
+import org.wiwokdetok.kapsulkeaslian.service.UserService;
 
 @RestController
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private AuthenticationService authenticationService;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private UserService userService;
 
     @AllowedRoles({"USER"})
     @PatchMapping(
@@ -42,27 +37,11 @@ public class UserController {
             @RequestHeader(name = "Authorization", required = false) String token,
             @Valid @RequestBody UpdateUserRequest request) {
 
-        UUID userId = UUID.fromString(jwtTokenProvider.extractId(token.substring(7)));
+        User user = authenticationService.getUserFromToken(token);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
+        userService.validateEmailChange(user, request.getEmail());
 
-        if (!user.getEmail().equals(request.getEmail())) {
-            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email sudah terdaftar");
-            }
-        }
-
-        Optional.ofNullable(request.getEmail())
-                .ifPresent(user::setEmail);
-
-        Optional.ofNullable(request.getName())
-                .ifPresent(user::setName);
-
-        Optional.ofNullable(request.getBio())
-                .ifPresent(user::setBio);
-
-        userRepository.save(user);
+        userService.updateUserData(user, request);
 
         WebResponse<String> response = WebResponse.<String>builder()
                 .data("OK")
@@ -79,21 +58,9 @@ public class UserController {
     public ResponseEntity<WebResponse<UserProfileResponse>> userProfile(
             @PathVariable("id") String id) {
 
-        Optional<User> user = userRepository.findById(UUID.fromString(id));
+        User user = userService.getUserById(id);
 
-        if (user.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan");
-        }
-
-        UserProfileResponse userProfile = UserProfileResponse.builder()
-                .email(user.get().getEmail())
-                .name(user.get().getName())
-                .bio(user.get().getBio())
-                .profilePicture(user.get().getProfilePicture())
-                .followers(user.get().getFollowers())
-                .followings(user.get().getFollowings())
-                .points(user.get().getPoints())
-                .build();
+        UserProfileResponse userProfile = userService.mapToUserProfileResponse(user);
 
         WebResponse<UserProfileResponse> response = WebResponse.<UserProfileResponse>builder()
                 .data(userProfile)
