@@ -17,6 +17,9 @@ public class UpdateUserRequest {
     @Size(max = 254, message = "Email maksimum 254 karakter")
     private String email;
 
-    @Size(max = 150, message = "Nama maksimum 150 karakter")
+    @Size(max = 50, message = "Nama maksimum 50 karakter")
     private String name;
+
+    @Size(max = 150, message = "Bio maksimum 150 karakter")
+    private String bio;
 }

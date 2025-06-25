@@ -26,6 +26,6 @@ public class RegisterUserRequest {
     private String confirmPassword;
 
     @NotBlank
-    @Size(max = 150, message = "Nama maksimum 150 karakter")
+    @Size(max = 50, message = "Nama maksimum 50 karakter")
     private String name;
 }

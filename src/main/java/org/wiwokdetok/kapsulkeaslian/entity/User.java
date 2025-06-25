@@ -28,6 +28,8 @@ public class User {
 
     private String name;
 
+    private String bio;
+
     private String role;
 
     @Column(name = "profile_picture")
