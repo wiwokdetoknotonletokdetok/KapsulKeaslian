@@ -23,31 +23,45 @@ jobs:
       - name: Save Docker image to file
         run: docker save kapsulkeaslian:latest -o kapsulkeaslian.tar
 
-      - name: Copy Docker image to server
+      - name: Create .env file from secrets
+        run: |
+          cat <<EOF > .env
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_USERNAME=${{ secrets.DB_USERNAME }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          EOF
+
+      - name: Copy Docker image and .env to server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: "kapsulkeaslian.tar"
-          target: "~/"
+          source: |
+            kapsulkeaslian.tar
+            .env
+          target: "~/kapsulkeaslian"
 
-      - name: Load and run Docker image on server
+      - name: Deploy on remote server
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            docker stop kapsulkeaslian || true && docker rm kapsulkeaslian || true
-            docker load -i ~/kapsulkeaslian.tar
+            mkdir -p ~/kapsulkeaslian
+            cd ~/kapsulkeaslian
+            
+            docker stop kapsulkeaslian || true
+            docker rm kapsulkeaslian || true
+            
+            docker load -i kapsulkeaslian.tar
+            
             docker run -d \
               --name kapsulkeaslian \
+              --env-file ~/kapsulkeaslian/.env \
               -p 8080:8080 \
-              -e DB_NAME=${{ secrets.DB_NAME }} \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e DB_HOST=${{ secrets.DB_HOST }} \
-              -e DB_PORT=${{ secrets.DB_PORT }} \
-              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
               kapsulkeaslian:latest
