@@ -1,5 +1,7 @@
 package org.wiwokdetok.kapsulkeaslian.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -53,5 +55,22 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
         } catch (JwtException e) {
             return false;
         }
+    }
+
+    public Claims decodeToken(String token) throws JwtException {
+        Jws<Claims> jws = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token);
+
+        return jws.getBody();
+    }
+
+    public String getId(Claims payload) {
+        return payload.getSubject();
+    }
+
+    public String getRole(Claims payload) {
+        return payload.get("role", String.class);
     }
 }

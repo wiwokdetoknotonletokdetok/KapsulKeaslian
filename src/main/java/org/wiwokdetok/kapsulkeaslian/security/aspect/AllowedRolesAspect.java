@@ -1,5 +1,6 @@
 package org.wiwokdetok.kapsulkeaslian.security.aspect;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -29,11 +30,15 @@ public class AllowedRolesAspect {
     public void checkAllowedRoles(JoinPoint joinPoint) {
         String token = getToken();
 
-        if (!jwtTokenProvider.validateToken(token)) {
+        Claims payload;
+
+        try {
+            payload = jwtTokenProvider.decodeToken(token);
+        } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
         }
 
-        String roleFromToken = jwtTokenProvider.extractRole(token);
+        String roleFromToken = jwtTokenProvider.getRole(payload);
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();

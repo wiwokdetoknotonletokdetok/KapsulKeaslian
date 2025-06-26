@@ -1,5 +1,6 @@
 package org.wiwokdetok.kapsulkeaslian.service;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -63,7 +64,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     public User getUserFromToken(String token) {
-        UUID userId = UUID.fromString(jwtTokenProvider.extractId(token.substring(7)));
+        Claims payload = jwtTokenProvider.decodeToken(token.substring(7));
+        UUID userId = UUID.fromString(jwtTokenProvider.getId(payload));
 
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
