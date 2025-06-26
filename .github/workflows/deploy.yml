@@ -34,13 +34,18 @@ jobs:
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           EOF
 
+      - name: Prepare deploy files
+        run: |
+          mkdir deploy
+          mv kapsulkeaslian.tar .env deploy/
+
       - name: Copy Docker image and .env to server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: "."
+          source: "deploy/*"
           target: "~/kapsulkeaslian"
 
       - name: Deploy on remote server
