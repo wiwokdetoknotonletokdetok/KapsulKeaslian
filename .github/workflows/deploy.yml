@@ -59,6 +59,7 @@ jobs:
             
             docker stop kapsulkeaslian || true
             docker rm kapsulkeaslian || true
+            docker rmi kapsulkeaslian:latest || true
             
             docker load -i kapsulkeaslian.tar
             
