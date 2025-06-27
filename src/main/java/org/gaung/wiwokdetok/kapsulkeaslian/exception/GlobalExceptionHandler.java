@@ -44,12 +44,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<WebResponse<String>> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException ex) {
-        WebResponse<String> errorResponse = WebResponse.<String>builder()
+    public ResponseEntity<WebResponse<?>> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException ex) {
+        WebResponse<?> response = WebResponse.builder()
                 .errors("Missing or unsupported Content-Type")
                 .build();
 
-        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
