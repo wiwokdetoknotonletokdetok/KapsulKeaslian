@@ -50,25 +50,6 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
                 .compact();
     }
 
-    public String extractId(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token).getBody().getSubject();
-    }
-
-    public String extractRole(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token).getBody().get("role", String.class);
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException e) {
-            return false;
-        }
-    }
-
     public Claims decodeToken(String token) throws JwtException {
         Jws<Claims> jws = Jwts.parserBuilder()
                 .setSigningKey(key)
