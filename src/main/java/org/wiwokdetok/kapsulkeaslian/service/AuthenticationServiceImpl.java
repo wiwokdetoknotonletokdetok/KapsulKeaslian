@@ -7,7 +7,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.wiwokdetok.kapsulkeaslian.entity.User;
+import org.wiwokdetok.kapsulkeaslian.model.LoginUserResponse;
 import org.wiwokdetok.kapsulkeaslian.model.RegisterUserRequest;
+import org.wiwokdetok.kapsulkeaslian.model.UpdatePasswordRequest;
 import org.wiwokdetok.kapsulkeaslian.repository.UserRepository;
 import org.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
 
@@ -25,7 +27,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User authenticate(String email, String password) {
+    @Override
+    public LoginUserResponse authenticate(String email, String password) {
+        User user = getUserByEmailAndPassword(email, password);
+
+        String token = jwtTokenProvider.generateToken(user.getId(), user.getEmail());
+
+        LoginUserResponse loginUserResponse = new LoginUserResponse();
+        loginUserResponse.setToken(token);
+
+        return loginUserResponse;
+    }
+
+    private User getUserByEmailAndPassword(String email, String password) {
         String message = "Username atau password tidak valid";
 
         User user = userRepository.findByEmail(email)
@@ -38,19 +52,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return user;
     }
 
-    public void validatePasswordConfirm(String password, String confirmPassword) {
-        if (!password.equals(confirmPassword)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password tidak cocok");
-        }
+    @Override
+    public void registerUser(RegisterUserRequest request) {
+        checkEmailExists(request.getEmail());
+
+        validatePasswordConfirm(request.getPassword(), request.getConfirmPassword());
+
+        saveUser(request);
     }
 
-    public void checkEmailExists(String email) {
+    private void checkEmailExists(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email sudah terdaftar");
         }
     }
 
-    public void registerUser(RegisterUserRequest request) {
+    private void validatePasswordConfirm(String password, String confirmPassword) {
+        if (!password.equals(confirmPassword)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password tidak cocok");
+        }
+    }
+
+    private void saveUser(RegisterUserRequest request) {
         User user = new User();
         user.setId(UUID.randomUUID());
         user.setEmail(request.getEmail());
@@ -59,30 +82,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setBio("");
         user.setRole("USER");
         user.setProfilePicture("http://example.com");
-
         userRepository.save(user);
     }
 
+    @Override
+    public void updateUserPassword(String token, UpdatePasswordRequest request) {
+        User user = getUserFromToken(token);
+
+        user = getUserByEmailAndPassword(user.getEmail(), request.getCurrentPassword());
+
+        validatePasswordConfirm(request.getNewPassword(), request.getConfirmNewPassword());
+
+        validateNewPassword(request.getCurrentPassword(), request.getNewPassword());
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    private void validateNewPassword(String currentPassword, String newPassword) {
+        if (currentPassword.equals(newPassword)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password baru identik dengan yang lama");
+        }
+    }
+
+    @Override
     public User getUserFromToken(String token) {
         Claims payload = jwtTokenProvider.decodeToken(token.substring(7));
         UUID userId = UUID.fromString(jwtTokenProvider.getId(payload));
 
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
-    }
-
-    public void updatePassword(User user, String newPassword) {
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-    }
-
-    public String generateToken(User user) {
-        return jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRole());
-    }
-
-    public void validateNewPassword(String currentPassword, String newPassword) {
-        if (currentPassword.equals(newPassword)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password baru identik dengan yang lama");
-        }
     }
 }

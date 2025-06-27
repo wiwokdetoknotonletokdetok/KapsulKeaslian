@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import org.wiwokdetok.kapsulkeaslian.entity.User;
 import org.wiwokdetok.kapsulkeaslian.model.LoginUserRequest;
 import org.wiwokdetok.kapsulkeaslian.model.LoginUserResponse;
 import org.wiwokdetok.kapsulkeaslian.model.RegisterUserRequest;
@@ -33,15 +32,10 @@ public class AuthenticationController {
     public ResponseEntity<WebResponse<LoginUserResponse>> login(
             @Valid @RequestBody LoginUserRequest request) {
 
-        User user = authenticationService.authenticate(request.getEmail(), request.getPassword());
-
-        String token = authenticationService.generateToken(user);
-
-        LoginUserResponse loginUserResponse = new LoginUserResponse();
-        loginUserResponse.setToken(token);
+        LoginUserResponse userToken = authenticationService.authenticate(request.getEmail(), request.getPassword());
 
         WebResponse<LoginUserResponse> response = WebResponse.<LoginUserResponse>builder()
-                .data(loginUserResponse)
+                .data(userToken)
                 .build();
 
         return ResponseEntity.ok(response);
@@ -54,10 +48,6 @@ public class AuthenticationController {
     )
     public ResponseEntity<WebResponse<String>> register(
             @Valid @RequestBody RegisterUserRequest request) {
-
-        authenticationService.checkEmailExists(request.getEmail());
-
-        authenticationService.validatePasswordConfirm(request.getPassword(), request.getConfirmPassword());
 
         authenticationService.registerUser(request);
 
@@ -92,15 +82,7 @@ public class AuthenticationController {
             @RequestHeader(name = "Authorization", required = false) String token,
             @Valid @RequestBody UpdatePasswordRequest request) {
 
-        User user = authenticationService.getUserFromToken(token);
-
-        user = authenticationService.authenticate(user.getEmail(), request.getCurrentPassword());
-
-        authenticationService.validatePasswordConfirm(request.getNewPassword(), request.getConfirmNewPassword());
-
-        authenticationService.validateNewPassword(request.getCurrentPassword(), request.getNewPassword());
-
-        authenticationService.updatePassword(user, request.getNewPassword());
+        authenticationService.updateUserPassword(token, request);
 
         WebResponse<String> response = WebResponse.<String>builder()
                 .data("OK")
