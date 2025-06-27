@@ -17,10 +17,10 @@ public class UpdatePasswordRequest {
     private String currentPassword;
 
     @NotBlank
-    @Size(max = 72, message = "Password maksimum 72 karakter")
+    @Size(min = 8, max = 72, message = "Password harus antara 8 hingga 72 karakter")
     private String newPassword;
 
     @NotBlank
-    @Size(max = 72, message = "Password maksimum 72 karakter")
+    @Size(min = 8, max = 72, message = "Password harus antara 8 hingga 72 karakter")
     private String confirmNewPassword;
 }
