@@ -6,11 +6,11 @@ import org.wiwokdetok.kapsulkeaslian.model.UserProfileResponse;
 
 public interface UserService {
 
-    void validateEmailChange(User user, String newEmail);
+    void updateUserProfile(UpdateUserRequest updateUserRequest, String token);
 
-    void updateUserData(User user, UpdateUserRequest request);
+    UserProfileResponse getUserProfile(String id);
 
     User getUserById(String id);
 
-    UserProfileResponse mapToUserProfileResponse(User user);
+    User getUserFromToken(String token);
 }

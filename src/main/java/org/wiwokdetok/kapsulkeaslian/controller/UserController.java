@@ -10,19 +10,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import org.wiwokdetok.kapsulkeaslian.entity.User;
 import org.wiwokdetok.kapsulkeaslian.model.UpdateUserRequest;
 import org.wiwokdetok.kapsulkeaslian.model.UserProfileResponse;
 import org.wiwokdetok.kapsulkeaslian.model.WebResponse;
 import org.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles;
-import org.wiwokdetok.kapsulkeaslian.service.AuthenticationService;
 import org.wiwokdetok.kapsulkeaslian.service.UserService;
 
 @RestController
 public class UserController {
-
-    @Autowired
-    private AuthenticationService authenticationService;
 
     @Autowired
     private UserService userService;
@@ -37,11 +32,7 @@ public class UserController {
             @RequestHeader(name = "Authorization", required = false) String token,
             @Valid @RequestBody UpdateUserRequest request) {
 
-        User user = authenticationService.getUserFromToken(token);
-
-        userService.validateEmailChange(user, request.getEmail());
-
-        userService.updateUserData(user, request);
+        userService.updateUserProfile(request, token);
 
         WebResponse<String> response = WebResponse.<String>builder()
                 .data("OK")
@@ -57,9 +48,7 @@ public class UserController {
     public ResponseEntity<WebResponse<UserProfileResponse>> userProfile(
             @PathVariable("id") String id) {
 
-        User user = userService.getUserById(id);
-
-        UserProfileResponse userProfile = userService.mapToUserProfileResponse(user);
+        UserProfileResponse userProfile = userService.getUserProfile(id);
 
         WebResponse<UserProfileResponse> response = WebResponse.<UserProfileResponse>builder()
                 .data(userProfile)

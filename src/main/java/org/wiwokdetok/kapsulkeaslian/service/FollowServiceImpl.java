@@ -16,9 +16,6 @@ import java.util.List;
 public class FollowServiceImpl implements FollowService {
 
     @Autowired
-    private AuthenticationService authenticationService;
-
-    @Autowired
     private UserService userService;
 
     @Autowired
@@ -26,7 +23,7 @@ public class FollowServiceImpl implements FollowService {
 
     @Override
     public void followUser(String token, String id) {
-        User fromUser = authenticationService.getUserFromToken(token);
+        User fromUser = userService.getUserFromToken(token);
 
         User toUser = userService.getUserById(id);
 
@@ -45,7 +42,7 @@ public class FollowServiceImpl implements FollowService {
     @Override
     @Transactional
     public void unfollowUser(String token, String id) {
-        User fromUser = authenticationService.getUserFromToken(token);
+        User fromUser = userService.getUserFromToken(token);
 
         User toUser = userService.getUserById(id);
 

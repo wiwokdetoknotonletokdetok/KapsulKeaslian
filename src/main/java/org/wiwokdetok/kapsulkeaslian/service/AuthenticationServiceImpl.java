@@ -19,6 +19,9 @@ import java.util.UUID;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -87,7 +90,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void updateUserPassword(String token, UpdatePasswordRequest request) {
-        User user = getUserFromToken(token);
+        User user = userService.getUserFromToken(token);
 
         user = getUserByEmailAndPassword(user.getEmail(), request.getCurrentPassword());
 
@@ -103,14 +106,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (currentPassword.equals(newPassword)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password baru identik dengan yang lama");
         }
-    }
-
-    @Override
-    public User getUserFromToken(String token) {
-        Claims payload = jwtTokenProvider.decodeToken(token.substring(7));
-        UUID userId = UUID.fromString(jwtTokenProvider.getId(payload));
-
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
     }
 }
