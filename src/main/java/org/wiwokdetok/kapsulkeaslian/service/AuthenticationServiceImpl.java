@@ -1,19 +1,17 @@
 package org.wiwokdetok.kapsulkeaslian.service;
 
-import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.wiwokdetok.kapsulkeaslian.entity.User;
+import org.wiwokdetok.kapsulkeaslian.factory.UserFactory;
 import org.wiwokdetok.kapsulkeaslian.model.LoginUserResponse;
 import org.wiwokdetok.kapsulkeaslian.model.RegisterUserRequest;
 import org.wiwokdetok.kapsulkeaslian.model.UpdatePasswordRequest;
 import org.wiwokdetok.kapsulkeaslian.repository.UserRepository;
 import org.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
-
-import java.util.UUID;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -23,6 +21,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserFactory userFactory;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -36,10 +37,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         String token = jwtTokenProvider.generateToken(user.getId(), user.getEmail());
 
-        LoginUserResponse loginUserResponse = new LoginUserResponse();
-        loginUserResponse.setToken(token);
-
-        return loginUserResponse;
+        return new LoginUserResponse(token);
     }
 
     private User getUserByEmailAndPassword(String email, String password) {
@@ -48,9 +46,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, message));
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, message);
-        }
+        validatePassword(user, password, message);
 
         return user;
     }
@@ -77,14 +73,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private void saveUser(RegisterUserRequest request) {
-        User user = new User();
-        user.setId(UUID.randomUUID());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setName(request.getName());
-        user.setBio("");
-        user.setRole("USER");
-        user.setProfilePicture("http://example.com");
+        User user = userFactory.createUser(request);
         userRepository.save(user);
     }
 
@@ -92,19 +81,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void updateUserPassword(String token, UpdatePasswordRequest request) {
         User user = userService.getUserFromToken(token);
 
-        user = getUserByEmailAndPassword(user.getEmail(), request.getCurrentPassword());
+        validatePassword(user, request.getCurrentPassword(), "Password tidak valid");
 
         validatePasswordConfirm(request.getNewPassword(), request.getConfirmNewPassword());
 
         validateNewPassword(request.getCurrentPassword(), request.getNewPassword());
 
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
+        updatePassword(user, request.getNewPassword());
+    }
+
+    private void validatePassword(User user, String currentPassword, String message) {
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, message);
+        }
     }
 
     private void validateNewPassword(String currentPassword, String newPassword) {
         if (currentPassword.equals(newPassword)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password baru identik dengan yang lama");
         }
+    }
+
+    private void updatePassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }
