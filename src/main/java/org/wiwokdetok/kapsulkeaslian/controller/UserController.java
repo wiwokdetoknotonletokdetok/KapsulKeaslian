@@ -50,7 +50,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @AllowedRoles({"USER"})
     @GetMapping(
             path = "/users/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
