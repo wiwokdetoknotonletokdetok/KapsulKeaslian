@@ -187,13 +187,10 @@ public class UserControllerTest {
 
     @Test
     void testGetUserProfileSuccess() throws Exception {
-        String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRole());
-
         mockMvc.perform(
                 get("/users/" + user.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -206,13 +203,10 @@ public class UserControllerTest {
 
     @Test
     void testGetUserProfileWhenUserIsNotFound() throws Exception {
-        String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRole());
-
         mockMvc.perform(
                 get("/users/" + UUID.randomUUID())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
         ).andExpectAll(
                 status().isNotFound()
         ).andDo(result -> {
