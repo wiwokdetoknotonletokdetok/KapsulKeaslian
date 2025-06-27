@@ -12,8 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.wiwokdetok.kapsulkeaslian.entity.User;
-import org.wiwokdetok.kapsulkeaslian.model.LoginUserResponse;
 import org.wiwokdetok.kapsulkeaslian.model.UpdateUserRequest;
+import org.wiwokdetok.kapsulkeaslian.model.UserProfileResponse;
 import org.wiwokdetok.kapsulkeaslian.model.WebResponse;
 import org.wiwokdetok.kapsulkeaslian.repository.UserRepository;
 import org.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
@@ -97,7 +97,7 @@ public class UserControllerTest {
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
-            WebResponse<LoginUserResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNotNull(response.getData());
             assertNull(response.getErrors());
@@ -124,7 +124,7 @@ public class UserControllerTest {
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
-            WebResponse<LoginUserResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNotNull(response.getData());
             assertNull(response.getErrors());
@@ -151,7 +151,7 @@ public class UserControllerTest {
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
-            WebResponse<LoginUserResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNotNull(response.getData());
             assertNull(response.getErrors());
@@ -178,7 +178,7 @@ public class UserControllerTest {
         ).andExpectAll(
                 status().isBadRequest()
         ).andDo(result -> {
-            WebResponse<LoginUserResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNull(response.getData());
             assertNotNull(response.getErrors());;
@@ -194,7 +194,7 @@ public class UserControllerTest {
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
-            WebResponse<LoginUserResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            WebResponse<UserProfileResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNotNull(response.getData());
             assertNull(response.getErrors());;
@@ -210,7 +210,7 @@ public class UserControllerTest {
         ).andExpectAll(
                 status().isNotFound()
         ).andDo(result -> {
-            WebResponse<LoginUserResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            WebResponse<UserProfileResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNull(response.getData());
             assertNotNull(response.getErrors());;
