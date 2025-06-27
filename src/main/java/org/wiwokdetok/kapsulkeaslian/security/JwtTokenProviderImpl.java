@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtTokenProviderImpl implements JwtTokenProvider {
@@ -22,15 +23,26 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 
     private SecretKey key;
 
+    private final long expiration = 1000 * 60 * 60 * 24 * 7;
+
     @PostConstruct
     public void init() {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(String id, String role) {
-        long expiration = 1000 * 60 * 60;
         return Jwts.builder()
                 .setSubject(id)
+                .claim("role", role)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateToken(UUID id, String role) {
+        return Jwts.builder()
+                .setSubject(String.valueOf(id))
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
