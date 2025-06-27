@@ -18,4 +18,6 @@ public interface AuthenticationService {
     void updatePassword(User user, String newPassword);
 
     String generateToken(User user);
+
+    void validateNewPassword(String currentPassword, String newPassword);
 }

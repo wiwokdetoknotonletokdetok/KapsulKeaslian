@@ -79,4 +79,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public String generateToken(User user) {
         return jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRole());
     }
+
+    public void validateNewPassword(String currentPassword, String newPassword) {
+        if (currentPassword.equals(newPassword)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password baru identik dengan yang lama");
+        }
+    }
 }

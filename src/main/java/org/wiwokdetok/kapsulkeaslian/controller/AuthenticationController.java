@@ -98,6 +98,8 @@ public class AuthenticationController {
 
         authenticationService.validatePasswordConfirm(request.getNewPassword(), request.getConfirmNewPassword());
 
+        authenticationService.validateNewPassword(request.getCurrentPassword(), request.getNewPassword());
+
         authenticationService.updatePassword(user, request.getNewPassword());
 
         WebResponse<String> response = WebResponse.<String>builder()

@@ -329,4 +329,29 @@ public class AuthenticationControllerTest {
             assertNotNull(response.getErrors());
         });
     }
+
+    @Test
+    void testUpdatePasswordFailedWhenNewPasswordIsEqualsToCurrentPassword() throws Exception {
+        UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest();
+        updatePasswordRequest.setCurrentPassword(user.getPassword());
+        updatePasswordRequest.setNewPassword(user.getPassword());
+        updatePasswordRequest.setConfirmNewPassword(user.getPassword());
+
+        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+
+        mockMvc.perform(
+                patch("/auth/password")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatePasswordRequest))
+                        .header("Authorization", "Bearer " + token)
+        ).andExpectAll(
+                status().isBadRequest()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
 }
