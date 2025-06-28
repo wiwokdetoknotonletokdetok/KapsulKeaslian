@@ -10,5 +10,5 @@ public interface AuthenticationService {
 
     void registerUser(RegisterUserRequest request);
 
-    void updateUserPassword(String token, UpdatePasswordRequest request);
+    void updateUserPassword(String id, UpdatePasswordRequest request);
 }

@@ -78,8 +78,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void updateUserPassword(String token, UpdatePasswordRequest request) {
-        User user = userService.getUserFromToken(token);
+    public void updateUserPassword(String id, UpdatePasswordRequest request) {
+        User user = userService.getUserById(id);
 
         validatePassword(user, request.getCurrentPassword(), "Password tidak valid");
 

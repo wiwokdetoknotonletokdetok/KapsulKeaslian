@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Deprecated
 public @interface AllowedRoles {
     String[] value();
 }

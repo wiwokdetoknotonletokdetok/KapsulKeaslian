@@ -6,16 +6,15 @@ import org.gaung.wiwokdetok.kapsulkeaslian.dto.LoginUserResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.RegisterUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdatePasswordRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
-import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles;
 import org.gaung.wiwokdetok.kapsulkeaslian.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -58,7 +57,6 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @AllowedRoles({"USER"})
     @PostMapping(
             path = "/auth/logout",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -72,17 +70,16 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
-    @AllowedRoles({"USER"})
     @PatchMapping(
             path = "/auth/password",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<String>> updatePassword(
-            @RequestHeader(name = "Authorization", required = false) String token,
+            Authentication authentication,
             @Valid @RequestBody UpdatePasswordRequest request) {
 
-        authenticationService.updateUserPassword(token, request);
+        authenticationService.updateUserPassword(authentication.getName(), request);
 
         WebResponse<String> response = WebResponse.<String>builder()
                 .data("OK")
