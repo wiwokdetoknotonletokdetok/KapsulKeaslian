@@ -34,6 +34,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -242,6 +243,26 @@ public class UserControllerTest {
                         .content(objectMapper.writeValueAsString(updateUserRequest))
         ).andExpectAll(
                 status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());;
+        });
+    }
+
+    @Test
+    void testUpdateUserWhenMethodIsInvalid() throws Exception {
+        UpdateUserRequest updateUserRequest = new UpdateUserRequest();
+        updateUserRequest.setEmail("notavailable@wiwokdetok.org");
+
+        mockMvc.perform(
+                post("/users/me")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateUserRequest))
+        ).andExpectAll(
+                status().isMethodNotAllowed()
         ).andDo(result -> {
             WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });

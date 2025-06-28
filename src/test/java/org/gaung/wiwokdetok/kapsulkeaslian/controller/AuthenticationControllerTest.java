@@ -255,6 +255,22 @@ public class AuthenticationControllerTest {
     }
 
     @Test
+    void testLogoutFailedWhenMethodIsNotAllowedAndTokenIsNull() throws Exception {
+        mockMvc.perform(
+                patch("/auth/logout")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isMethodNotAllowed()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
     void testLogoutWhenTokenIsNull() throws Exception {
         mockMvc.perform(
                 post("/auth/logout")
