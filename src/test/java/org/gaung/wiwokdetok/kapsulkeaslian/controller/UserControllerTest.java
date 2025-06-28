@@ -2,6 +2,9 @@ package org.gaung.wiwokdetok.kapsulkeaslian.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import org.gaung.wiwokdetok.kapsulkeaslian.config.TestConfig;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdateUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserProfileResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,12 +29,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(TestConfig.class)
 public class UserControllerTest {
 
     @Autowired
@@ -79,21 +87,25 @@ public class UserControllerTest {
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
+        reset(jwtTokenProvider);
     }
 
     @Test
     void testUpdateUserEmailSuccess() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
+
         UpdateUserRequest updateUserRequest = new UpdateUserRequest();
         updateUserRequest.setEmail("updated@wiwokdetok.org");
-
-        String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRole());
 
         mockMvc.perform(
                 patch("/users/me")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateUserRequest))
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -110,17 +122,20 @@ public class UserControllerTest {
 
     @Test
     void testUpdateUserBioSuccess() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
+
         UpdateUserRequest updateUserRequest = new UpdateUserRequest();
         updateUserRequest.setBio("Updated");
-
-        String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRole());
 
         mockMvc.perform(
                 patch("/users/me")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateUserRequest))
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -137,17 +152,20 @@ public class UserControllerTest {
 
     @Test
     void testUpdateUserNameSuccess() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
+
         UpdateUserRequest updateUserRequest = new UpdateUserRequest();
         updateUserRequest.setName("Updated Test User");
-
-        String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRole());
 
         mockMvc.perform(
                 patch("/users/me")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateUserRequest))
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -164,19 +182,46 @@ public class UserControllerTest {
 
     @Test
     void testUpdateUserWhenEmailIsTaken() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
+
         UpdateUserRequest updateUserRequest = new UpdateUserRequest();
         updateUserRequest.setEmail("notavailable@wiwokdetok.org");
-
-        String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRole());
 
         mockMvc.perform(
                 patch("/users/me")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateUserRequest))
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isBadRequest()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());;
+        });
+    }
+
+    @Test
+    void testUpdateUserWhenTokenIsInvalid() throws Exception {
+        when(jwtTokenProvider.decodeToken("invalid.token.here"))
+                .thenThrow(new JwtException("Invalid token"));
+
+        UpdateUserRequest updateUserRequest = new UpdateUserRequest();
+        updateUserRequest.setEmail("notavailable@wiwokdetok.org");
+
+        mockMvc.perform(
+                patch("/users/me")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateUserRequest))
+                        .header("Authorization", "Bearer invalid.token.here")
+        ).andExpectAll(
+                status().isUnauthorized()
         ).andDo(result -> {
             WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
@@ -202,11 +247,53 @@ public class UserControllerTest {
     }
 
     @Test
-    void testGetUserProfileWhenUserIsNotFound() throws Exception {
+    void testGetUserProfileSuccessWhenUserIsAuthenticated() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
+
+        mockMvc.perform(
+                get("/users/" + user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer valid.token.here")
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<UserProfileResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNotNull(response.getData());
+            assertNull(response.getErrors());;
+        });
+    }
+
+    @Test
+    void testGetUserNotFound() throws Exception {
         mockMvc.perform(
                 get("/users/" + UUID.randomUUID())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isNotFound()
+        ).andDo(result -> {
+            WebResponse<UserProfileResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());;
+        });
+    }
+
+    @Test
+    void testGetUserNotFoundWhenUserIsAuthenticated() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
+
+        mockMvc.perform(
+                get("/users/" + UUID.randomUUID())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isNotFound()
         ).andDo(result -> {

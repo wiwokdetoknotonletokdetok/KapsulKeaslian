@@ -2,6 +2,8 @@ package org.gaung.wiwokdetok.kapsulkeaslian.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import org.gaung.wiwokdetok.kapsulkeaslian.config.TestConfig;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.SimpleUserResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.Follow;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +28,9 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -32,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(TestConfig.class)
 public class FollowControllerTest {
 
     @Autowired
@@ -85,17 +92,21 @@ public class FollowControllerTest {
     void tearDown() {
         followRepository.deleteAll();
         userRepository.deleteAll();
+        reset(jwtTokenProvider);
     }
 
     @Test
     void testFollowSuccess() throws Exception {
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         mockMvc.perform(
                 post("/users/{id}/follow", user2.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -108,13 +119,16 @@ public class FollowControllerTest {
 
     @Test
     void testFollowFailedWhenFollowHimSelf() throws Exception {
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         mockMvc.perform(
                 post("/users/{id}/follow", user.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isBadRequest()
         ).andDo(result -> {
@@ -127,7 +141,10 @@ public class FollowControllerTest {
 
     @Test
     void testFollowFailedWhenTargetUserIsAlreadyFollowed() throws Exception {
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         Follow follow = new Follow(user, user2);
         followRepository.save(follow);
@@ -136,7 +153,7 @@ public class FollowControllerTest {
                 post("/users/{id}/follow", user2.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isBadRequest()
         ).andDo(result -> {
@@ -149,13 +166,16 @@ public class FollowControllerTest {
 
     @Test
     void testFollowFailedWhenTargetUserIsNotFound() throws Exception {
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         mockMvc.perform(
                 post("/users/{id}/follow", UUID.randomUUID())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isNotFound()
         ).andDo(result -> {
@@ -168,7 +188,10 @@ public class FollowControllerTest {
 
     @Test
     void testUnfollowSuccess() throws Exception {
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         Follow follow = new Follow(user, user2);
         followRepository.save(follow);
@@ -177,7 +200,7 @@ public class FollowControllerTest {
                 delete("/users/{id}/follow", user2.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -190,13 +213,16 @@ public class FollowControllerTest {
 
     @Test
     void testUnfollowFailedWhenTargetUserNotFollowed() throws Exception {
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         mockMvc.perform(
                 delete("/users/{id}/follow", user2.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isBadRequest()
         ).andDo(result -> {
@@ -209,13 +235,16 @@ public class FollowControllerTest {
 
     @Test
     void testUnfollowFailedWhenTargetUserIsHimSelf() throws Exception {
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         mockMvc.perform(
                 delete("/users/{id}/follow", user.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isBadRequest()
         ).andDo(result -> {
@@ -228,7 +257,10 @@ public class FollowControllerTest {
 
     @Test
     void testCurrentUserFollowersCount() throws Exception {
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         Follow follow = new Follow(user, user2);
         followRepository.save(follow);
@@ -237,7 +269,7 @@ public class FollowControllerTest {
                 get("/users/{id}/followers", user.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -251,7 +283,10 @@ public class FollowControllerTest {
 
     @Test
     void testCurrentUserFollowingsCount() throws Exception {
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         Follow follow = new Follow(user, user2);
         followRepository.save(follow);
@@ -260,7 +295,8 @@ public class FollowControllerTest {
                 get("/users/{id}/followings", user.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
+
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -274,7 +310,10 @@ public class FollowControllerTest {
 
     @Test
     void testTargetUserFollowersCount() throws Exception {
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         Follow follow = new Follow(user, user2);
         followRepository.save(follow);
@@ -283,7 +322,7 @@ public class FollowControllerTest {
                 get("/users/{id}/followers", user2.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -297,7 +336,10 @@ public class FollowControllerTest {
 
     @Test
     void testTargetUserFollowingsCount() throws Exception {
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole());
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         Follow follow = new Follow(user, user2);
         followRepository.save(follow);
@@ -306,7 +348,7 @@ public class FollowControllerTest {
                 get("/users/{id}/followings", user2.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer valid.token.here")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {

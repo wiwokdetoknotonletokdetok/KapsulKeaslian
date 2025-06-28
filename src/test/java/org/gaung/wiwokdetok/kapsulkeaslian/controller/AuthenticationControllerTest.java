@@ -3,6 +3,7 @@ package org.gaung.wiwokdetok.kapsulkeaslian.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import org.gaung.wiwokdetok.kapsulkeaslian.config.TestConfig;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.LoginUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.LoginUserResponse;
@@ -19,11 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -31,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -77,6 +77,7 @@ public class AuthenticationControllerTest {
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
+        reset(jwtTokenProvider);
     }
 
     @Test
@@ -215,7 +216,7 @@ public class AuthenticationControllerTest {
     void testLogoutSuccess() throws Exception {
         Claims payload = mock(Claims.class);
         when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
-        when(jwtTokenProvider.getRole(payload)).thenReturn("USER");
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         mockMvc.perform(
                 post("/auth/logout")
@@ -251,7 +252,7 @@ public class AuthenticationControllerTest {
     @Test
     void testLogoutWhenTokenIsInvalid() throws Exception {
         when(jwtTokenProvider.decodeToken("invalid.token.here"))
-                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token"));
+                .thenThrow(new JwtException("Invalid token"));
 
         mockMvc.perform(
                 post("/auth/logout")
@@ -274,7 +275,7 @@ public class AuthenticationControllerTest {
         Claims payload = mock(Claims.class);
         when(jwtTokenProvider.decodeToken(token)).thenReturn(payload);
         when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
-        when(jwtTokenProvider.getRole(payload)).thenReturn("USER");
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest();
         updatePasswordRequest.setCurrentPassword(user.getPassword());
@@ -298,11 +299,37 @@ public class AuthenticationControllerTest {
     }
 
     @Test
+    void testUpdatePasswordFailedWhenTokenIsInvalid() throws Exception {
+        when(jwtTokenProvider.decodeToken("invalid.token.here"))
+                .thenThrow(new JwtException("Invalid token"));
+
+        UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest();
+        updatePasswordRequest.setCurrentPassword(user.getPassword());
+        updatePasswordRequest.setNewPassword("new" + user.getPassword());
+        updatePasswordRequest.setConfirmNewPassword("new" + user.getPassword());
+
+        mockMvc.perform(
+                patch("/auth/password")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatePasswordRequest))
+                        .header("Authorization", "Bearer invalid.token.here")
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
     void testUpdatePasswordWhenCurrentPasswordIsIncorrect() throws Exception {
         Claims payload = mock(Claims.class);
         when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
         when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
-        when(jwtTokenProvider.getRole(payload)).thenReturn("USER");
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest();
         updatePasswordRequest.setCurrentPassword("IncorrectPassword");
@@ -330,7 +357,7 @@ public class AuthenticationControllerTest {
         Claims payload = mock(Claims.class);
         when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
         when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
-        when(jwtTokenProvider.getRole(payload)).thenReturn("USER");
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest();
         updatePasswordRequest.setCurrentPassword(user.getPassword());
@@ -358,7 +385,7 @@ public class AuthenticationControllerTest {
         Claims payload = mock(Claims.class);
         when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
         when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
-        when(jwtTokenProvider.getRole(payload)).thenReturn("USER");
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
 
         UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest();
         updatePasswordRequest.setCurrentPassword(user.getPassword());
