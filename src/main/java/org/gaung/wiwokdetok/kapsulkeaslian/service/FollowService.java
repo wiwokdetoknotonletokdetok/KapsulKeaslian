@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface FollowService {
 
-    void followUser(String token, String id);
+    void followUser(String fromUserId, String toUserId);
 
-    void unfollowUser(String token, String id);
+    void unfollowUser(String fromUserId, String toUserId);
 
     List<SimpleUserResponse> getUserFollowers(String id);
 

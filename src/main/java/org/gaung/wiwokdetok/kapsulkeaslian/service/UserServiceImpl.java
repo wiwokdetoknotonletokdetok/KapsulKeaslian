@@ -1,11 +1,9 @@
 package org.gaung.wiwokdetok.kapsulkeaslian.service;
 
-import io.jsonwebtoken.Claims;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdateUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserProfileResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
-import org.gaung.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,12 +18,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
     @Override
-    public void updateUserProfile(UpdateUserRequest request, String token) {
-        User user = getUserFromToken(token);
+    public void updateUserProfile(String id, UpdateUserRequest request) {
+        User user = getUserById(id);
 
         validateEmailChange(user, request.getEmail());
 
@@ -83,14 +78,5 @@ public class UserServiceImpl implements UserService {
                 .followings(user.getFollowings())
                 .points(user.getPoints())
                 .build();
-    }
-
-    @Override
-    public User getUserFromToken(String token) {
-        Claims payload = jwtTokenProvider.decodeToken(token.substring(7));
-        UUID userId = UUID.fromString(jwtTokenProvider.getId(payload));
-
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
     }
 }

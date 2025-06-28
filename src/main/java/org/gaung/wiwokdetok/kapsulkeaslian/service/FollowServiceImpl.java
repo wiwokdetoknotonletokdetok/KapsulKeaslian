@@ -22,10 +22,10 @@ public class FollowServiceImpl implements FollowService {
     private FollowRepository followRepository;
 
     @Override
-    public void followUser(String token, String id) {
-        User fromUser = userService.getUserFromToken(token);
+    public void followUser(String fromUserId, String toUserId) {
+        User fromUser = userService.getUserById(fromUserId);
 
-        User toUser = userService.getUserById(id);
+        User toUser = userService.getUserById(toUserId);
 
         if (fromUser.equals(toUser)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tidak dapat mengikuti diri sendiri");
@@ -41,10 +41,10 @@ public class FollowServiceImpl implements FollowService {
 
     @Override
     @Transactional
-    public void unfollowUser(String token, String id) {
-        User fromUser = userService.getUserFromToken(token);
+    public void unfollowUser(String fromUserId, String toUserId) {
+        User fromUser = userService.getUserById(fromUserId);
 
-        User toUser = userService.getUserById(id);
+        User toUser = userService.getUserById(toUserId);
 
         if (!followRepository.existsByFollowerAndFollowing(fromUser, toUser)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Belum mengikuti pengguna ini");
