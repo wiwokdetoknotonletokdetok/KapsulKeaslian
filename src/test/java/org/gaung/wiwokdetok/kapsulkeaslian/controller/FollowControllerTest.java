@@ -3,6 +3,7 @@ package org.gaung.wiwokdetok.kapsulkeaslian.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import org.gaung.wiwokdetok.kapsulkeaslian.config.TestConfig;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.SimpleUserResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
@@ -118,6 +119,42 @@ public class FollowControllerTest {
     }
 
     @Test
+    void testFollowFailedWhenTokenIsNull() throws Exception {
+        mockMvc.perform(
+                post("/users/{id}/follow", user2.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void testFollowFailedWhenTokenIsInvalid() throws Exception {
+        when(jwtTokenProvider.decodeToken("invalid.token.here"))
+                .thenThrow(new JwtException("Invalid token"));
+
+        mockMvc.perform(
+                post("/users/{id}/follow", user2.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer invalid.token.here")
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
     void testFollowFailedWhenFollowHimSelf() throws Exception {
         Claims payload = mock(Claims.class);
         when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
@@ -212,6 +249,49 @@ public class FollowControllerTest {
     }
 
     @Test
+    void testUnfollowFailedWhenTokenIsNull() throws Exception {
+        Follow follow = new Follow(user, user2);
+        followRepository.save(follow);
+
+        mockMvc.perform(
+                delete("/users/{id}/follow", user2.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void testUnfollowFailedWhenTokenIsInvalid() throws Exception {
+        when(jwtTokenProvider.decodeToken("invalid.token.here"))
+                .thenThrow(new JwtException("Invalid token"));
+
+        Follow follow = new Follow(user, user2);
+        followRepository.save(follow);
+
+        mockMvc.perform(
+                delete("/users/{id}/follow", user2.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer invalid.token.here")
+
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
     void testUnfollowFailedWhenTargetUserNotFollowed() throws Exception {
         Claims payload = mock(Claims.class);
         when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
@@ -249,6 +329,78 @@ public class FollowControllerTest {
                 status().isBadRequest()
         ).andDo(result -> {
             WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void testGetCurrentUserFollowersFailedWhenTokenIsNull() throws Exception {
+        mockMvc.perform(
+                get("/users/{id}/followers", user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<List<SimpleUserResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void testGetCurrentUserFollowersFailedWhenTokenIsInvalid() throws Exception {
+        when(jwtTokenProvider.decodeToken("invalid.token.here"))
+                .thenThrow(new JwtException("Invalid token"));
+
+        mockMvc.perform(
+                get("/users/{id}/followers", user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer invalid.token.here")
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<List<SimpleUserResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void testGetCurrentUserFollowingsFailedWhenTokenIsNull() throws Exception {
+        mockMvc.perform(
+                get("/users/{id}/followings", user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<List<SimpleUserResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void testGetCurrentUserFollowingsFailedWhenTokenIsInvalid() throws Exception {
+        when(jwtTokenProvider.decodeToken("invalid.token.here"))
+                .thenThrow(new JwtException("Invalid token"));
+
+        mockMvc.perform(
+                get("/users/{id}/followings", user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer invalid.token.here")
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<List<SimpleUserResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNull(response.getData());
             assertNotNull(response.getErrors());

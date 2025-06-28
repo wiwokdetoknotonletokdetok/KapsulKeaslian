@@ -231,6 +231,26 @@ public class UserControllerTest {
     }
 
     @Test
+    void testUpdateUserWhenTokenIsNull() throws Exception {
+        UpdateUserRequest updateUserRequest = new UpdateUserRequest();
+        updateUserRequest.setEmail("notavailable@wiwokdetok.org");
+
+        mockMvc.perform(
+                patch("/users/me")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateUserRequest))
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());;
+        });
+    }
+
+    @Test
     void testGetUserProfileSuccess() throws Exception {
         mockMvc.perform(
                 get("/users/" + user.getId())
@@ -257,6 +277,26 @@ public class UserControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer valid.token.here")
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<UserProfileResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNotNull(response.getData());
+            assertNull(response.getErrors());;
+        });
+    }
+
+    @Test
+    void testGetUserProfileSuccessWhenTokenIsInvalid() throws Exception {
+        when(jwtTokenProvider.decodeToken("invalid.token.here"))
+                .thenThrow(new JwtException("Invalid token"));
+
+        mockMvc.perform(
+                get("/users/" + user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer invalid.token.here")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {

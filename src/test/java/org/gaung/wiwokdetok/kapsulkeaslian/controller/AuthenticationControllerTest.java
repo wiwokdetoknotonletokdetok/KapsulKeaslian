@@ -234,6 +234,27 @@ public class AuthenticationControllerTest {
     }
 
     @Test
+    void testLogoutFailedWhenMethodIsNotAllowed() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
+
+        mockMvc.perform(
+                patch("/auth/logout")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer valid.token.here")
+        ).andExpectAll(
+                status().isMethodNotAllowed()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
     void testLogoutWhenTokenIsNull() throws Exception {
         mockMvc.perform(
                 post("/auth/logout")
@@ -295,6 +316,28 @@ public class AuthenticationControllerTest {
             });
             assertNotNull(response.getData());
             assertNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void testUpdatePasswordFailedWhenTokenIsNull() throws Exception {
+        UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest();
+        updatePasswordRequest.setCurrentPassword(user.getPassword());
+        updatePasswordRequest.setNewPassword("new" + user.getPassword());
+        updatePasswordRequest.setConfirmNewPassword("new" + user.getPassword());
+
+        mockMvc.perform(
+                patch("/auth/password")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatePasswordRequest))
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
         });
     }
 
