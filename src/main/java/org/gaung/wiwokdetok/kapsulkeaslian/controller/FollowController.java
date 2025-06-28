@@ -1,8 +1,10 @@
 package org.gaung.wiwokdetok.kapsulkeaslian.controller;
 
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.SimpleUserResponse;
+import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserPrincipal;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles;
+import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.CurrentUser;
 import org.gaung.wiwokdetok.kapsulkeaslian.service.FollowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -28,10 +29,10 @@ public class FollowController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<String>> followUser(
-            @RequestHeader(name = "Authorization", required = false) String token,
+            @CurrentUser UserPrincipal user,
             @PathVariable("id") String id) {
 
-        followService.followUser(token, id);
+        followService.followUser(user.getId(), id);
 
         WebResponse<String> response = WebResponse.<String>builder()
                 .data("OK")
@@ -46,10 +47,10 @@ public class FollowController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<String>> unfollowUser(
-            @RequestHeader(name = "Authorization", required = false) String token,
+            @CurrentUser UserPrincipal user,
             @PathVariable("id") String id) {
 
-        followService.unfollowUser(token, id);
+        followService.unfollowUser(user.getId(), id);
 
         WebResponse<String> response = WebResponse.<String>builder()
                 .data("OK")

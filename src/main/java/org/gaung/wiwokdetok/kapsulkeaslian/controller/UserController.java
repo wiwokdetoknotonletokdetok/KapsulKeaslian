@@ -2,9 +2,11 @@ package org.gaung.wiwokdetok.kapsulkeaslian.controller;
 
 import jakarta.validation.Valid;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdateUserRequest;
+import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserPrincipal;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserProfileResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles;
+import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.CurrentUser;
 import org.gaung.wiwokdetok.kapsulkeaslian.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,10 +30,10 @@ public class UserController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<String>> updateUser(
-            @RequestHeader(name = "Authorization", required = false) String token,
+            @CurrentUser UserPrincipal user,
             @Valid @RequestBody UpdateUserRequest request) {
 
-        userService.updateUserProfile(request, token);
+        userService.updateUserProfile(user.getId(), request);
 
         WebResponse<String> response = WebResponse.<String>builder()
                 .data("OK")
