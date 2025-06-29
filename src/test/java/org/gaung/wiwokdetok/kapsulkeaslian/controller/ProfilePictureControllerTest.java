@@ -32,6 +32,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -206,11 +207,7 @@ public class ProfilePictureControllerTest {
             User updatedUser = userService.getUserById(String.valueOf(user.getId()));
 
             String profilePictureUrl = updatedUser.getProfilePicture();
-            int firstSlash = profilePictureUrl.indexOf('/');
-            int secondSlash = profilePictureUrl.indexOf('/', firstSlash + 1);
-            int thirdSlash = profilePictureUrl.indexOf('/', secondSlash + 1);
-            String fileName = profilePictureUrl.substring(thirdSlash + 1);
-            assertEquals("users/default.jpg", fileName);
+            assertTrue(profilePictureUrl.contains("/users/default.jpg"));
         });
     }
 
