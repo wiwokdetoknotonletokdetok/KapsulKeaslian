@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.stream.Collectors;
 
@@ -19,16 +20,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<WebResponse<?>> handleGenericException(Exception ex) {
         WebResponse<?> response = WebResponse.builder()
-                .errors("Internal server error")
+                .errors("Internal Server Error")
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<WebResponse<?>> handleNotFound(NoHandlerFoundException ex) {
+        WebResponse<?> response = WebResponse.builder()
+                .errors("Not Found")
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<WebResponse<?>> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
         WebResponse<?> response = WebResponse.builder()
-                .errors("Method not allowed")
+                .errors("Method Not Allowed")
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
