@@ -1,5 +1,8 @@
 package org.gaung.wiwokdetok.kapsulkeaslian.controller;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.PutObjectResult;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -17,17 +20,23 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,6 +49,9 @@ public class ProfilePictureControllerTest {
 
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private AmazonS3 amazonS3;
 
     @Autowired
     private UserRepository userRepository;
@@ -73,6 +85,82 @@ public class ProfilePictureControllerTest {
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
+    }
+
+    @Test
+    void testUploadProfilePictureSuccess() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
+
+        BufferedImage dummyImage = new BufferedImage(320, 320, BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(dummyImage, "jpg", os);
+        byte[] imageBytes = os.toByteArray();
+
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "profilePicture",
+                "dummy.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                imageBytes
+        );
+
+        when(amazonS3.putObject(any(PutObjectRequest.class)))
+                .thenReturn(new PutObjectResult());
+
+        mockMvc.perform(
+                multipart("/users/me/profile-picture")
+                        .file(multipartFile)
+                        .header("Authorization", "Bearer valid.token.here")
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isCreated()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {}
+            );
+            assertNotNull(response.getData());
+            assertNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void testUploadProfilePictureFailedWhenImageIsTooSmall() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
+
+        BufferedImage dummyImage = new BufferedImage(100, 320, BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(dummyImage, "jpg", os);
+        byte[] imageBytes = os.toByteArray();
+
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "profilePicture",
+                "dummy.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                imageBytes
+        );
+
+        when(amazonS3.putObject(any(PutObjectRequest.class)))
+                .thenReturn(new PutObjectResult());
+
+        mockMvc.perform(
+                multipart("/users/me/profile-picture")
+                        .file(multipartFile)
+                        .header("Authorization", "Bearer valid.token.here")
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isBadRequest()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {}
+            );
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+        });
     }
 
     @Test
