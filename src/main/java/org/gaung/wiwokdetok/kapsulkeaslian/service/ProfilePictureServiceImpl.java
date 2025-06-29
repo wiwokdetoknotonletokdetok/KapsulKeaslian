@@ -39,7 +39,7 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
 
     @Override
     public String uploadProfilePicture(String userId, MultipartFile file) {
-        String fileName = userId + ".jpg";
+        String fileName = String.format("users/%s.jpg", userId);
         String version = String.valueOf(System.currentTimeMillis());
 
         try {
@@ -87,7 +87,7 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
     public void deleteProfilePicture(String id) {
         User user = userService.getUserById(id);
 
-        user.setProfilePicture(publicEndpoint + "/default.jpg");
+        user.setProfilePicture(publicEndpoint + "/users/default.jpg");
         userRepository.save(user);
     }
 }

@@ -22,7 +22,7 @@ public class UserFactory {
        return buildBaseUser(request)
                .role("USER")
                .bio("")
-               .profilePicture(publicEndpoint + "/default.jpg")
+               .profilePicture(publicEndpoint + "/users/default.jpg")
                .build();
     }
 
