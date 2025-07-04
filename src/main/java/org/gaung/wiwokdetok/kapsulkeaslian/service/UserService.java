@@ -11,4 +11,5 @@ public interface UserService {
     UserProfileResponse getUserProfile(String id);
 
     User getUserById(String id);
+    void addPoints(String id, int points);
 }
