@@ -1,8 +1,7 @@
 package org.gaung.wiwokdetok.kapsulkeaslian.service;
 
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.SimpleUserResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface FollowService {
 
@@ -10,7 +9,7 @@ public interface FollowService {
 
     void unfollowUser(String fromUserId, String toUserId);
 
-    List<SimpleUserResponse> getUserFollowers(String id);
+    Page<SimpleUserResponse> getUserFollowers(String id, int page, int size);
 
-    List<SimpleUserResponse> getUserFollowings(String id);
+    Page<SimpleUserResponse> getUserFollowings(String id, int page, int size);
 }

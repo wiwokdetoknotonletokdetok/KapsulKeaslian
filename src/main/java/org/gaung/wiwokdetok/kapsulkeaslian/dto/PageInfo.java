@@ -1,6 +1,5 @@
 package org.gaung.wiwokdetok.kapsulkeaslian.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,12 +9,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class WebResponse<T> {
+public class PageInfo {
 
-    private T data;
+    private int size;
 
-    private String errors;
+    private int currentPage;
 
-    private PageInfo pageInfo;
+    private int totalPages;
+
+    private long totalElements;
 }

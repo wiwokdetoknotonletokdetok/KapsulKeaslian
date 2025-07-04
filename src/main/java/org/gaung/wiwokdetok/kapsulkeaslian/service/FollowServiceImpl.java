@@ -5,12 +5,13 @@ import org.gaung.wiwokdetok.kapsulkeaslian.model.Follow;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.FollowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @Service
 public class FollowServiceImpl implements FollowService {
@@ -54,16 +55,22 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public List<SimpleUserResponse> getUserFollowers(String id) {
+    public Page<SimpleUserResponse> getUserFollowers(String id, int page, int size) {
         User user = userService.getUserById(id);
+        Pageable pageable = PageRequest.of(processPage(page), size);
 
-        return followRepository.findFollowerUsers(user);
+        return followRepository.findFollowerUsers(user, pageable);
     }
 
     @Override
-    public List<SimpleUserResponse> getUserFollowings(String id) {
+    public Page<SimpleUserResponse> getUserFollowings(String id, int page, int size) {
         User user = userService.getUserById(id);
+        Pageable pageable = PageRequest.of(processPage(page), size);
 
-        return followRepository.findFollowingUsers(user);
+        return followRepository.findFollowingUsers(user, pageable);
+    }
+
+    private int processPage(int page) {
+        return page - 1;
     }
 }
