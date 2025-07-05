@@ -4,7 +4,6 @@ import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdateUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserProfileResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,8 +14,11 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public void updateUserProfile(UUID userId, UpdateUserRequest request) {

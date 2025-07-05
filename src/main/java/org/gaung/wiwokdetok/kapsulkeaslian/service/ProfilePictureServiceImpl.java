@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ProfilePictureServiceImpl implements ProfilePictureService {
 
     @Value("${CLOUDFLARE_R2_BUCKET_NAME}")
@@ -29,14 +31,11 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
     @Value("${CLOUDFLARE_R2_PUBLIC_ENDPOINT}")
     private String publicEndpoint;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private AmazonS3 amazonS3;
+    private final AmazonS3 amazonS3;
 
     @Override
     public String uploadProfilePicture(UUID userId, MultipartFile file) {

@@ -1,5 +1,6 @@
 package org.gaung.wiwokdetok.kapsulkeaslian.service;
 
+import lombok.RequiredArgsConstructor;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.LoginUserResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.RegisterUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdatePasswordRequest;
@@ -7,7 +8,6 @@ import org.gaung.wiwokdetok.kapsulkeaslian.factory.UserFactory;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,22 +16,18 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserFactory userFactory;
+    private final UserFactory userFactory;
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public LoginUserResponse authenticate(String email, String password) {

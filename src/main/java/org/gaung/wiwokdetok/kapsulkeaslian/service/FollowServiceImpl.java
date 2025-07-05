@@ -1,10 +1,10 @@
 package org.gaung.wiwokdetok.kapsulkeaslian.service;
 
+import lombok.RequiredArgsConstructor;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.SimpleUserResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.Follow;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.FollowRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,13 +16,12 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class FollowServiceImpl implements FollowService {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private FollowRepository followRepository;
+    private final FollowRepository followRepository;
 
     @Override
     public void followUser(UUID fromUserId, UUID toUserId) {

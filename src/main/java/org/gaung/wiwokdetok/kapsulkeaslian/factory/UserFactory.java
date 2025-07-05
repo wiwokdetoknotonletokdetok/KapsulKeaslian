@@ -2,7 +2,6 @@ package org.gaung.wiwokdetok.kapsulkeaslian.factory;
 
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.RegisterUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -13,8 +12,11 @@ public class UserFactory {
     @Value("${CLOUDFLARE_R2_PUBLIC_ENDPOINT}")
     private String publicEndpoint;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserFactory(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public User createUser(RegisterUserRequest request) {
        return buildBaseUser(request)

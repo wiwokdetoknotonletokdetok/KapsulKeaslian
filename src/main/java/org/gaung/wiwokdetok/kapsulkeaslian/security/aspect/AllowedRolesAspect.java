@@ -10,7 +10,6 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -25,8 +24,11 @@ import java.util.List;
 @Component
 public class AllowedRolesAspect {
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public AllowedRolesAspect(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @Before("@annotation(org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles)")
     public void checkAllowedRoles(JoinPoint joinPoint) {

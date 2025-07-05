@@ -1,7 +1,6 @@
 package org.gaung.wiwokdetok.kapsulkeaslian.config;
 
 import org.gaung.wiwokdetok.kapsulkeaslian.security.resolver.CurrentUserResolver;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -12,8 +11,11 @@ import java.util.List;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Autowired
-    private CurrentUserResolver currentUserResolver;
+    private final CurrentUserResolver currentUserResolver;
+
+    public WebMvcConfig(CurrentUserResolver currentUserResolver) {
+        this.currentUserResolver = currentUserResolver;
+    }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
