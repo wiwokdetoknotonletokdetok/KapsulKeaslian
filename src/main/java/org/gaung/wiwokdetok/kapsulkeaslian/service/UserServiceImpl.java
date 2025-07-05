@@ -7,6 +7,7 @@ import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -79,4 +80,15 @@ public class UserServiceImpl implements UserService {
                 .points(user.getPoints())
                 .build();
     }
+
+    @Override
+    @Transactional
+    public void addPoints(String userId, int pointsToAdd) {
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPoints(user.getPoints() + pointsToAdd);
+        userRepository.save(user);
+    }
+
 }
