@@ -2,9 +2,11 @@ package org.gaung.wiwokdetok.kapsulkeaslian.service;
 
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdateUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserProfileResponse;
+import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserRankingResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -91,4 +95,12 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public List<UserRankingResponse> getUserRanking() {
+        List<User> users = userRepository.findAll(Sort.by(Sort.Direction.DESC, "points"));
+
+        return users.stream()
+                .map(user -> new UserRankingResponse(user.getId().toString(), user.getName(), user.getPoints()))
+                .collect(Collectors.toList());
+    }
 }
