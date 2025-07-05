@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.UUID;
 
 @Service
 public class ProfilePictureServiceImpl implements ProfilePictureService {
@@ -38,7 +39,7 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
     private AmazonS3 amazonS3;
 
     @Override
-    public String uploadProfilePicture(String userId, MultipartFile file) {
+    public String uploadProfilePicture(UUID userId, MultipartFile file) {
         String fileName = String.format("users/%s.jpg", userId);
         String version = String.valueOf(System.currentTimeMillis());
 
@@ -76,16 +77,16 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
         }
     }
 
-    private void saveUserProfilePicture(String id, String profilePictureUrl) {
-        User user = userService.getUserById(id);
+    private void saveUserProfilePicture(UUID userId, String profilePictureUrl) {
+        User user = userService.getUserById(userId);
 
         user.setProfilePicture(profilePictureUrl);
         userRepository.save(user);
     }
 
     @Override
-    public void deleteProfilePicture(String id) {
-        User user = userService.getUserById(id);
+    public void deleteProfilePicture(UUID userId) {
+        User user = userService.getUserById(userId);
 
         user.setProfilePicture(publicEndpoint + "/users/default.jpg");
         userRepository.save(user);

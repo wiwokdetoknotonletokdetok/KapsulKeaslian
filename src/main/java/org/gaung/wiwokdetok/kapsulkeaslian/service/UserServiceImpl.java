@@ -19,8 +19,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public void updateUserProfile(String id, UpdateUserRequest request) {
-        User user = getUserById(id);
+    public void updateUserProfile(UUID userId, UpdateUserRequest request) {
+        User user = getUserById(userId);
 
         validateEmailChange(user, request.getEmail());
 
@@ -49,21 +49,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfileResponse getUserProfile(String id) {
-        User user = getUserById(id);
+    public UserProfileResponse getUserProfile(UUID userId) {
+        User user = getUserById(userId);
 
         return mapToUserProfileResponse(user);
     }
 
     @Override
-    public User getUserById(String id) {
-        UUID userId;
-        try {
-            userId = UUID.fromString(id);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID user tidak valid");
-        }
-
+    public User getUserById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
     }

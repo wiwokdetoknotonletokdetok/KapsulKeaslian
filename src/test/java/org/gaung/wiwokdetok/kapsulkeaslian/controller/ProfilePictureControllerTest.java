@@ -203,7 +203,7 @@ public class ProfilePictureControllerTest {
             assertNotNull(response.getData());
             assertNull(response.getErrors());
 
-            User updatedUser = userService.getUserById(String.valueOf(user.getId()));
+            User updatedUser = userRepository.findById(user.getId()).orElseThrow();
 
             String profilePictureUrl = updatedUser.getProfilePicture();
             assertTrue(profilePictureUrl.contains("/users/default.jpg"));

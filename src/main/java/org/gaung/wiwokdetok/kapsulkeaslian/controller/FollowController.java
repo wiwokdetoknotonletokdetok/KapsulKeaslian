@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,14 +32,14 @@ public class FollowController {
 
     @AllowedRoles({"USER"})
     @PostMapping(
-            path = "/users/{id}/follow",
+            path = "/users/{userId}/follow",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<String>> followUser(
             @CurrentUser UserPrincipal user,
-            @PathVariable("id") String id) {
+            @PathVariable("userId") UUID userId) {
 
-        followService.followUser(user.getId(), id);
+        followService.followUser(user.getId(), userId);
 
         WebResponse<String> response = WebResponse.<String>builder()
                 .data("OK")
@@ -49,14 +50,14 @@ public class FollowController {
 
     @AllowedRoles({"USER"})
     @DeleteMapping(
-            path = "/users/{id}/follow",
+            path = "/users/{userId}/follow",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<String>> unfollowUser(
             @CurrentUser UserPrincipal user,
-            @PathVariable("id") String id) {
+            @PathVariable("userId") UUID userId) {
 
-        followService.unfollowUser(user.getId(), id);
+        followService.unfollowUser(user.getId(), userId);
 
         WebResponse<String> response = WebResponse.<String>builder()
                 .data("OK")
@@ -67,17 +68,17 @@ public class FollowController {
 
     @AllowedRoles({"USER"})
     @GetMapping(
-            path = "/users/{id}/followers",
+            path = "/users/{userId}/followers",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<List<SimpleUserResponse>>> userFollowers(
-            @PathVariable("id") String id,
+            @PathVariable("userId") UUID userId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
         paginationValidator.validatePageAndSizeNumber(page, size);
 
-        Page<SimpleUserResponse> followersPage = followService.getUserFollowers(id, page, size);
+        Page<SimpleUserResponse> followersPage = followService.getUserFollowers(userId, page, size);
 
         paginationValidator.validatePageBounds(page, followersPage);
 
@@ -86,17 +87,17 @@ public class FollowController {
 
     @AllowedRoles({"USER"})
     @GetMapping(
-            path = "/users/{id}/followings",
+            path = "/users/{userId}/followings",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<List<SimpleUserResponse>>> userFollowings(
-            @PathVariable("id") String id,
+            @PathVariable("userId") UUID userId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
         paginationValidator.validatePageAndSizeNumber(page, size);
 
-        Page<SimpleUserResponse> followingsPage = followService.getUserFollowings(id, page, size);
+        Page<SimpleUserResponse> followingsPage = followService.getUserFollowings(userId, page, size);
 
         paginationValidator.validatePageBounds(page, followingsPage);
 

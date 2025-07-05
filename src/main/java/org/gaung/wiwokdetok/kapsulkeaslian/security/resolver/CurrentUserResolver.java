@@ -18,6 +18,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.UUID;
+
 @Component
 public class CurrentUserResolver implements HandlerMethodArgumentResolver {
 
@@ -58,6 +60,6 @@ public class CurrentUserResolver implements HandlerMethodArgumentResolver {
         String userId = jwtTokenProvider.getId(payload);
         String role = jwtTokenProvider.getRole(payload);
 
-        return new UserPrincipal(userId, role);
+        return new UserPrincipal(UUID.fromString(userId), role);
     }
 }

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.UUID;
+
 @Service
 public class FollowServiceImpl implements FollowService {
 
@@ -23,7 +25,7 @@ public class FollowServiceImpl implements FollowService {
     private FollowRepository followRepository;
 
     @Override
-    public void followUser(String fromUserId, String toUserId) {
+    public void followUser(UUID fromUserId, UUID toUserId) {
         User fromUser = userService.getUserById(fromUserId);
 
         User toUser = userService.getUserById(toUserId);
@@ -42,7 +44,7 @@ public class FollowServiceImpl implements FollowService {
 
     @Override
     @Transactional
-    public void unfollowUser(String fromUserId, String toUserId) {
+    public void unfollowUser(UUID fromUserId, UUID toUserId) {
         User fromUser = userService.getUserById(fromUserId);
 
         User toUser = userService.getUserById(toUserId);
@@ -55,16 +57,16 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public Page<SimpleUserResponse> getUserFollowers(String id, int page, int size) {
-        User user = userService.getUserById(id);
+    public Page<SimpleUserResponse> getUserFollowers(UUID userId, int page, int size) {
+        User user = userService.getUserById(userId);
         Pageable pageable = PageRequest.of(processPage(page), size);
 
         return followRepository.findFollowerUsers(user, pageable);
     }
 
     @Override
-    public Page<SimpleUserResponse> getUserFollowings(String id, int page, int size) {
-        User user = userService.getUserById(id);
+    public Page<SimpleUserResponse> getUserFollowings(UUID userId, int page, int size) {
+        User user = userService.getUserById(userId);
         Pageable pageable = PageRequest.of(processPage(page), size);
 
         return followRepository.findFollowingUsers(user, pageable);

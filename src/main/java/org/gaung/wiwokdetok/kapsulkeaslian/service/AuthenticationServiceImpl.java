@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.UUID;
+
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -78,8 +80,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void updateUserPassword(String id, UpdatePasswordRequest request) {
-        User user = userService.getUserById(id);
+    public void updateUserPassword(UUID userId, UpdatePasswordRequest request) {
+        User user = userService.getUserById(userId);
 
         validatePassword(user, request.getCurrentPassword(), "Password tidak valid");
 
