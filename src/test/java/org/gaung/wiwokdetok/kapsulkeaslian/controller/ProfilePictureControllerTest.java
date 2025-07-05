@@ -27,7 +27,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -73,7 +72,6 @@ public class ProfilePictureControllerTest {
         String password = "password";
 
         user = new User();
-        user.setId(UUID.randomUUID());
         user.setEmail("test@wiwokdetok.org");
         user.setPassword(passwordEncoder.encode(password));
         user.setName("Test User");

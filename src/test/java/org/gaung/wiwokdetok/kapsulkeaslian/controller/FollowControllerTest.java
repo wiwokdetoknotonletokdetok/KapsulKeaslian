@@ -66,7 +66,6 @@ public class FollowControllerTest {
         String password = "password";
 
         user = new User();
-        user.setId(UUID.randomUUID());
         user.setEmail("user@wiwokdetok.org");
         user.setPassword(passwordEncoder.encode(password));
         user.setName("Test User");
@@ -76,7 +75,6 @@ public class FollowControllerTest {
         userRepository.save(user);
 
         user2 = new User();
-        user2.setId(UUID.randomUUID());
         user2.setEmail("user2@wiwokdetok.org");
         user2.setPassword(passwordEncoder.encode(password));
         user2.setName("Test User 2");

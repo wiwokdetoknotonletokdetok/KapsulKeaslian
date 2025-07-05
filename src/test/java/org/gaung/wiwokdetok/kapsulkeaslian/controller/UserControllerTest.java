@@ -61,7 +61,6 @@ public class UserControllerTest {
         String password = "password";
 
         user = new User();
-        user.setId(UUID.randomUUID());
         user.setEmail("test@wiwokdetok.org");
         user.setPassword(passwordEncoder.encode(password));
         user.setName("Test User");
@@ -72,7 +71,6 @@ public class UserControllerTest {
         user.setPassword(password);
 
         User user2 = new User();
-        user2.setId(UUID.randomUUID());
         user2.setEmail("notavailable@wiwokdetok.org");
         user2.setPassword(passwordEncoder.encode(password));
         user2.setName("Test User 2");
