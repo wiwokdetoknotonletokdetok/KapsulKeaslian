@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdateUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserPrincipal;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserProfileResponse;
+import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserRankingResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.CurrentUser;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -81,5 +83,20 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping(
+            path = "/rank",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<WebResponse<List<UserRankingResponse>>> getUserRanking() {
+        List<UserRankingResponse> rankings = userService.getUserRanking();
+
+        WebResponse<List<UserRankingResponse>> response = WebResponse.<List<UserRankingResponse>>builder()
+                .data(rankings)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
 
 }

@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findAll(Sort.by(Sort.Direction.DESC, "points"));
 
         return users.stream()
-                .map(user -> new UserRankingResponse(user.getId().toString(), user.getName(), user.getPoints()))
+                .map(user -> new UserRankingResponse(user.getEmail().toString(), user.getName(), user.getPoints()))
                 .collect(Collectors.toList());
     }
 }
