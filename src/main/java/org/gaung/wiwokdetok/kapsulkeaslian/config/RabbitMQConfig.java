@@ -18,6 +18,20 @@ public class RabbitMQConfig {
     public static final String QUEUE_USER_POINTS = "user.points";
     public static final String ROUTING_KEY_USER_POINTS = "user.points";
     public static final String EXCHANGE_NAME = "book.exchange";
+    public static final String USER_POINT_MESSAGE_TYPE_ID = "org.gaung.wiwokdetok.fondasikehidupan.dto.UserPointMessage";
+
+    @Bean
+    public Jackson2JsonMessageConverter consumerJackson2MessageConverter() {
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+
+        Map<String, Class<?>> typeIdMappings = new HashMap<>();
+        typeIdMappings.put(USER_POINT_MESSAGE_TYPE_ID, UserPointMessage.class);
+        converter.setClassMapper(new DefaultClassMapper() {{
+            setIdClassMapping(typeIdMappings);
+        }});
+
+        return converter;
+    }
 
     @Bean
     public TopicExchange bookExchange() {
@@ -35,19 +49,6 @@ public class RabbitMQConfig {
                 .bind(userPointsQueue)
                 .to(bookExchange)
                 .with(ROUTING_KEY_USER_POINTS);
-    }
-
-    @Bean
-    public Jackson2JsonMessageConverter consumerJackson2MessageConverter() {
-        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
-
-        Map<String, Class<?>> typeIdMappings = new HashMap<>();
-        typeIdMappings.put("org.gaung.wiwokdetok.fondasikehidupan.dto.UserPointMessage", UserPointMessage.class);
-        converter.setClassMapper(new DefaultClassMapper() {{
-            setIdClassMapping(typeIdMappings);
-        }});
-
-        return converter;
     }
 
 }
