@@ -17,7 +17,7 @@ import java.util.Map;
 public class RabbitMQConfig {
     public static final String QUEUE_USER_POINTS = "user.points";
     public static final String ROUTING_KEY_USER_POINTS = "user.points";
-    public static final String EXCHANGE_NAME = "book.exchange";
+    public static final String BOOK_EXCHANGE_NAME = "book.exchange";
     public static final String USER_POINT_MESSAGE_TYPE_ID = "org.gaung.wiwokdetok.fondasikehidupan.dto.UserPointMessage";
 
     @Bean
@@ -34,11 +34,6 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public TopicExchange bookExchange() {
-        return new TopicExchange(EXCHANGE_NAME, true, false);
-    }
-
-    @Bean
     public Queue userPointsQueue() {
         return new Queue(QUEUE_USER_POINTS, true);
     }
@@ -51,4 +46,8 @@ public class RabbitMQConfig {
                 .with(ROUTING_KEY_USER_POINTS);
     }
 
+    @Bean
+    public TopicExchange bookExchange() {
+        return new TopicExchange(BOOK_EXCHANGE_NAME, true, false);
+    }
 }

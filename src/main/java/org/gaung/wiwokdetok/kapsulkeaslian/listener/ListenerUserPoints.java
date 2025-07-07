@@ -2,6 +2,6 @@ package org.gaung.wiwokdetok.kapsulkeaslian.listener;
 
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserPointMessage;
 
-public interface BookListener {
+public interface ListenerUserPoints {
     void listenUserPoints(UserPointMessage message);
 }
