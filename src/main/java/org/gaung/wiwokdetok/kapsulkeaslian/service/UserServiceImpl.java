@@ -2,10 +2,8 @@ package org.gaung.wiwokdetok.kapsulkeaslian.service;
 
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdateUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserProfileResponse;
-import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserRankingResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;

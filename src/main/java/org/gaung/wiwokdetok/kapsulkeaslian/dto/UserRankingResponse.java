@@ -8,7 +8,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class UserRankingResponse {
+
     private String email;
+
     private String name;
+
     private int points;
 }
