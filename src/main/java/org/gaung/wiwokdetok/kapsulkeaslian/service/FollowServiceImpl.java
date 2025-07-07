@@ -1,28 +1,30 @@
 package org.gaung.wiwokdetok.kapsulkeaslian.service;
 
+import lombok.RequiredArgsConstructor;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.SimpleUserResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.Follow;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.FollowRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class FollowServiceImpl implements FollowService {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private FollowRepository followRepository;
+    private final FollowRepository followRepository;
 
     @Override
-    public void followUser(String fromUserId, String toUserId) {
+    public void followUser(UUID fromUserId, UUID toUserId) {
         User fromUser = userService.getUserById(fromUserId);
 
         User toUser = userService.getUserById(toUserId);
@@ -41,7 +43,7 @@ public class FollowServiceImpl implements FollowService {
 
     @Override
     @Transactional
-    public void unfollowUser(String fromUserId, String toUserId) {
+    public void unfollowUser(UUID fromUserId, UUID toUserId) {
         User fromUser = userService.getUserById(fromUserId);
 
         User toUser = userService.getUserById(toUserId);
@@ -54,16 +56,22 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public List<SimpleUserResponse> getUserFollowers(String id) {
-        User user = userService.getUserById(id);
+    public Page<SimpleUserResponse> getUserFollowers(UUID userId, int page, int size) {
+        User user = userService.getUserById(userId);
+        Pageable pageable = PageRequest.of(processPage(page), size);
 
-        return followRepository.findFollowerUsers(user);
+        return followRepository.findFollowerUsers(user, pageable);
     }
 
     @Override
-    public List<SimpleUserResponse> getUserFollowings(String id) {
-        User user = userService.getUserById(id);
+    public Page<SimpleUserResponse> getUserFollowings(UUID userId, int page, int size) {
+        User user = userService.getUserById(userId);
+        Pageable pageable = PageRequest.of(processPage(page), size);
 
-        return followRepository.findFollowingUsers(user);
+        return followRepository.findFollowingUsers(user, pageable);
+    }
+
+    private int processPage(int page) {
+        return page - 1;
     }
 }

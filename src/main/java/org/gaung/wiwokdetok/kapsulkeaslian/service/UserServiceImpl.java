@@ -2,30 +2,27 @@ package org.gaung.wiwokdetok.kapsulkeaslian.service;
 
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdateUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserProfileResponse;
-import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserRankingResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
-    public void updateUserProfile(String id, UpdateUserRequest request) {
-        User user = getUserById(id);
+    public void updateUserProfile(UUID userId, UpdateUserRequest request) {
+        User user = getUserById(userId);
 
         validateEmailChange(user, request.getEmail());
 
@@ -54,21 +51,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfileResponse getUserProfile(String id) {
-        User user = getUserById(id);
+    public UserProfileResponse getUserProfile(UUID userId) {
+        User user = getUserById(userId);
 
         return mapToUserProfileResponse(user);
     }
 
     @Override
-    public User getUserById(String id) {
-        UUID userId;
-        try {
-            userId = UUID.fromString(id);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID user tidak valid");
-        }
-
+    public User getUserById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
     }
@@ -83,24 +73,5 @@ public class UserServiceImpl implements UserService {
                 .followings(user.getFollowings())
                 .points(user.getPoints())
                 .build();
-    }
-
-    @Override
-    @Transactional
-    public void addPoints(String userId, int pointsToAdd) {
-        User user = userRepository.findById(UUID.fromString(userId))
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        user.setPoints(user.getPoints() + pointsToAdd);
-        userRepository.save(user);
-    }
-
-    @Override
-    public List<UserRankingResponse> getUserRanking() {
-        List<User> users = userRepository.findAll(Sort.by(Sort.Direction.DESC, "points"));
-
-        return users.stream()
-                .map(user -> new UserRankingResponse(user.getEmail().toString(), user.getName(), user.getPoints()))
-                .collect(Collectors.toList());
     }
 }

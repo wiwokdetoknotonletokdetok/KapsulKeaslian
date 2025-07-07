@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserPrincipal;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.CurrentUser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -18,11 +17,16 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.UUID;
+
 @Component
 public class CurrentUserResolver implements HandlerMethodArgumentResolver {
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public CurrentUserResolver(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -58,6 +62,6 @@ public class CurrentUserResolver implements HandlerMethodArgumentResolver {
         String userId = jwtTokenProvider.getId(payload);
         String role = jwtTokenProvider.getRole(payload);
 
-        return new UserPrincipal(userId, role);
+        return new UserPrincipal(UUID.fromString(userId), role);
     }
 }

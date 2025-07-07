@@ -4,11 +4,11 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,8 +18,10 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ProfilePictureServiceImpl implements ProfilePictureService {
 
     @Value("${CLOUDFLARE_R2_BUCKET_NAME}")
@@ -28,17 +30,14 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
     @Value("${CLOUDFLARE_R2_PUBLIC_ENDPOINT}")
     private String publicEndpoint;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private AmazonS3 amazonS3;
+    private final AmazonS3 amazonS3;
 
     @Override
-    public String uploadProfilePicture(String userId, MultipartFile file) {
+    public String uploadProfilePicture(UUID userId, MultipartFile file) {
         String fileName = String.format("users/%s.jpg", userId);
         String version = String.valueOf(System.currentTimeMillis());
 
@@ -76,16 +75,16 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
         }
     }
 
-    private void saveUserProfilePicture(String id, String profilePictureUrl) {
-        User user = userService.getUserById(id);
+    private void saveUserProfilePicture(UUID userId, String profilePictureUrl) {
+        User user = userService.getUserById(userId);
 
         user.setProfilePicture(profilePictureUrl);
         userRepository.save(user);
     }
 
     @Override
-    public void deleteProfilePicture(String id) {
-        User user = userService.getUserById(id);
+    public void deleteProfilePicture(UUID userId) {
+        User user = userService.getUserById(userId);
 
         user.setProfilePicture(publicEndpoint + "/users/default.jpg");
         userRepository.save(user);
