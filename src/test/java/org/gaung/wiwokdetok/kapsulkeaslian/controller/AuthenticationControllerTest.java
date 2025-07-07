@@ -23,8 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -60,7 +58,6 @@ public class AuthenticationControllerTest {
         String password = "password";
 
         user = new User();
-        user.setId(UUID.randomUUID());
         user.setEmail("test@wiwokdetok.org");
         user.setPassword(passwordEncoder.encode(password));
         user.setName("Test User");

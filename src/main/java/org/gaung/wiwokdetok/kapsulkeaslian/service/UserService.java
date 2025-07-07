@@ -6,14 +6,15 @@ import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserRankingResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UserService {
 
-    void updateUserProfile(String id, UpdateUserRequest updateUserRequest);
+    void updateUserProfile(UUID userId, UpdateUserRequest updateUserRequest);
 
-    UserProfileResponse getUserProfile(String id);
+    UserProfileResponse getUserProfile(UUID userId);
 
-    User getUserById(String id);
-    void addPoints(String id, int points);
+    User getUserById(UUID userId);
+
     List<UserRankingResponse> getUserRanking();
 }

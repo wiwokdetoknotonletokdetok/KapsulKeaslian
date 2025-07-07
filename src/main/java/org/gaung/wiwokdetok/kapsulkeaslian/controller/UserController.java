@@ -9,24 +9,25 @@ import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.CurrentUser;
 import org.gaung.wiwokdetok.kapsulkeaslian.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 @RestController
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @AllowedRoles({"USER"})
     @PatchMapping(
@@ -48,37 +49,16 @@ public class UserController {
     }
 
     @GetMapping(
-            path = "/users/{id}",
+            path = "/users/{userId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<UserProfileResponse>> userProfile(
-            @PathVariable("id") String id) {
+            @PathVariable("userId") UUID userId) {
 
-        UserProfileResponse userProfile = userService.getUserProfile(id);
+        UserProfileResponse userProfile = userService.getUserProfile(userId);
 
         WebResponse<UserProfileResponse> response = WebResponse.<UserProfileResponse>builder()
                 .data(userProfile)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
-
-    @AllowedRoles({"USER"})
-    @PostMapping(
-            path = "/users/me/points",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<WebResponse<String>> addPointsToCurrentUser(
-            @CurrentUser UserPrincipal user,
-            @RequestBody Map<String, Integer> request) {
-
-        int pointsToAdd = request.get("points");
-
-        userService.addPoints(user.getId(), pointsToAdd);
-
-        WebResponse<String> response = WebResponse.<String>builder()
-                .data("Points added successfully")
                 .build();
 
         return ResponseEntity.ok(response);

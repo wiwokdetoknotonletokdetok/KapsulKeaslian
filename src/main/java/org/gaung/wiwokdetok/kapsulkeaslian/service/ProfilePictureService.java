@@ -2,9 +2,11 @@ package org.gaung.wiwokdetok.kapsulkeaslian.service;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 public interface ProfilePictureService {
 
-    String uploadProfilePicture(String id, MultipartFile profilePicture);
+    String uploadProfilePicture(UUID userId, MultipartFile profilePicture);
 
-    void deleteProfilePicture(String id);
+    void deleteProfilePicture(UUID userId);
 }

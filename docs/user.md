@@ -91,6 +91,77 @@ Mendapatkan profil publik dari user berdasarkan ID.
 
 ---
 
+## 📷️ POST `/users/me/profile-picture`
+
+Menambahkan profile picture user yang sedang login.  
+**Hanya untuk role:** `USER`
+
+### Request
+
+**Headers:**
+- `Authorization: Bearer <token>`
+- `Content-Type: multipart/form-data`
+
+**Body (form-data):**
+- `profilePicture`: (wajib) file – Gambar profil dengan format `.png`, `.jpg`, atau `.webp`, **minimal resolusi 320x320 px**
+
+### Response
+
+**Status Code:** `201 Created`
+```json
+{
+  "data": "Created"
+}
+```
+
+### Error Response
+
+**Status Code:** `400 Bad Request`
+```json
+{
+  "errors": "Gagal upload profile picture"
+}
+```
+
+**Status Code:** `401 Unauthorized`
+```json
+{
+  "errors": "Invalid token"
+}
+```
+
+---
+
+## ❌️ DELETE `/users/me/profile-picture`
+
+Mengembalikan profile picture user yang sedang login menjadi default.  
+**Hanya untuk role:** `USER`
+
+### Request
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+### Response
+
+**Status Code:** `200 OK`
+```json
+{
+  "data": "OK"
+}
+```
+
+### Error Response
+
+**Status Code:** `401 Unauthorized`
+```json
+{
+  "errors": "Invalid token"
+}
+```
+
+---
+
 ## 📦 Struktur `WebResponse<T>`
 
 ### Sukses:
