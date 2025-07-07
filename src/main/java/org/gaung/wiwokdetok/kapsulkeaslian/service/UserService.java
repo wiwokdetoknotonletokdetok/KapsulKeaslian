@@ -2,10 +2,8 @@ package org.gaung.wiwokdetok.kapsulkeaslian.service;
 
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdateUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserProfileResponse;
-import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserRankingResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -15,6 +13,4 @@ public interface UserService {
     UserProfileResponse getUserProfile(UUID userId);
 
     User getUserById(UUID userId);
-
-    List<UserRankingResponse> getUserRanking();
 }

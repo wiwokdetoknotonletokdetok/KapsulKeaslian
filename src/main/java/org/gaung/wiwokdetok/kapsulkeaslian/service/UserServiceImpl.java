@@ -76,23 +76,4 @@ public class UserServiceImpl implements UserService {
                 .points(user.getPoints())
                 .build();
     }
-
-    @Override
-    @Transactional
-    public void addPoints(String userId, int pointsToAdd) {
-        User user = userRepository.findById(UUID.fromString(userId))
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        user.setPoints(user.getPoints() + pointsToAdd);
-        userRepository.save(user);
-    }
-
-    @Override
-    public List<UserRankingResponse> getUserRanking() {
-        List<User> users = userRepository.findAll(Sort.by(Sort.Direction.DESC, "points"));
-
-        return users.stream()
-                .map(user -> new UserRankingResponse(user.getEmail().toString(), user.getName(), user.getPoints()))
-                .collect(Collectors.toList());
-    }
 }

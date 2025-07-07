@@ -8,6 +8,7 @@ import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserRankingResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.CurrentUser;
+import org.gaung.wiwokdetok.kapsulkeaslian.service.PointService;
 import org.gaung.wiwokdetok.kapsulkeaslian.service.UserService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +26,11 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    private final PointService pointService;
+
+    public UserController(UserService userService, PointService pointService) {
         this.userService = userService;
+        this.pointService = pointService;
     }
 
     @AllowedRoles({"USER"})
@@ -69,7 +73,7 @@ public class UserController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<List<UserRankingResponse>>> getUserRanking() {
-        List<UserRankingResponse> rankings = userService.getUserRanking();
+        List<UserRankingResponse> rankings = pointService.getUserRanking();
 
         WebResponse<List<UserRankingResponse>> response = WebResponse.<List<UserRankingResponse>>builder()
                 .data(rankings)
