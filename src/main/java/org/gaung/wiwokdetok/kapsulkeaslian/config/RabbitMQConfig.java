@@ -10,6 +10,8 @@ public class RabbitMQConfig {
 
     public static final String QUEUE_BOOK_ADDED = "book.added";
 
+    public static final String QUEUE_REVIEW_ADDED = "review.added";
+
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
@@ -18,5 +20,10 @@ public class RabbitMQConfig {
     @Bean
     public Queue bookAddedQueue() {
         return new Queue(QUEUE_BOOK_ADDED, true);
+    }
+
+    @Bean
+    public Queue reviewAddedQueue() {
+        return new Queue(QUEUE_REVIEW_ADDED, true);
     }
 }
