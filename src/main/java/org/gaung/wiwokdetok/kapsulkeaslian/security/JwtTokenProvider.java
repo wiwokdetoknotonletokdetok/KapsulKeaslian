@@ -6,9 +6,6 @@ import java.util.UUID;
 
 public interface JwtTokenProvider {
 
-    @Deprecated
-    String generateToken(String id, String role);
-
     String generateToken(UUID id, String role);
 
     Claims decodeToken(String token);

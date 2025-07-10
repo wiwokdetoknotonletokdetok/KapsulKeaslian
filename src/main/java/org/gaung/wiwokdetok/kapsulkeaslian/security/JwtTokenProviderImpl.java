@@ -30,16 +30,6 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String id, String role) {
-        return Jwts.builder()
-                .setSubject(id)
-                .claim("role", role)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-    }
-
     public String generateToken(UUID id, String role) {
         return Jwts.builder()
                 .setSubject(String.valueOf(id))
