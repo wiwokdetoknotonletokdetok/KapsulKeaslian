@@ -1,0 +1,44 @@
+name: SonarCloud analysis
+
+on:
+  workflow_run:
+    workflows: ["Unit Tests"]
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  pull-requests: read
+
+jobs:
+  Analysis:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jacoco-report
+          path: jacoco-report
+
+      - name: Analyze with SonarCloud
+        uses: SonarSource/sonarcloud-github-action@v2.2.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=wiwokdetoknotonletokdetok_KapsulKeaslian
+            -Dsonar.organization=wiwokdetoknotonletokdetok
+            -Dsonar.java.binaries=build/classes/java/main
+            -Dsonar.coverage.jacoco.xmlReportPaths=jacoco-report/jacocoTestReport.xml

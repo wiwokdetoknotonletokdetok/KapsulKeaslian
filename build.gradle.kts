@@ -46,18 +46,15 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.withType<Test> {
+tasks.test {
     useJUnitPlatform()
 }
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
-}
 
-tasks.test {
-    filter {
-        excludeTestsMatching("*FunctionalTest")
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
     }
-
-    finalizedBy(tasks.jacocoTestReport)
 }
