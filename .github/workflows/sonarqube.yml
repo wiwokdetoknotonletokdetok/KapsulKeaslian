@@ -52,4 +52,6 @@ jobs:
             -Dsonar.projectKey=wiwokdetoknotonletokdetok_KapsulKeaslian
             -Dsonar.organization=wiwokdetoknotonletokdetok
             -Dsonar.java.binaries=build/classes/java/main
+            -Dsonar.sources=src/main/java
+            -Dsonar.tests=src/test/java
             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
