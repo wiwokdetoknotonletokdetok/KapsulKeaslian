@@ -101,6 +101,14 @@ Mendapatkan daftar pengguna yang mengikuti user tersebut.
 **Path Variable:**
 - `id`: ID user yang ingin dicek followers-nya
 
+**Request Param:**
+- `page`: Menentukan halaman saat ini yang ingin diakses. (integer, default = 1)
+    - Nilai minimum: `1`
+    - Contoh: `1` berarti halaman pertama, `2` berarti halaman kedua, dan seterusnya.
+- `size`: Menentukan jumlah data yang akan ditampilkan per halaman. (integer, default = 10)
+    - Nilai minimum: `1`
+    - Contoh: `10` berarti setiap halaman akan berisi maksimal 10 data.
+
 ### Response
 
 **Status Code:** `200 OK`
@@ -112,7 +120,13 @@ Mendapatkan daftar pengguna yang mengikuti user tersebut.
       "name": "Nama User",
       "profilePicture": "http://example.com"
     }
-  ]
+  ],
+  "pageInfo": {
+    "size": 10,
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalElements": 1
+  }
 }
 ```
 
@@ -127,6 +141,14 @@ Mendapatkan daftar pengguna yang di-follow oleh user tersebut.
 **Path Variable:**
 - `id`: ID user yang ingin dicek followings-nya
 
+**Request Param:**
+- `page`: Menentukan halaman saat ini yang ingin diakses. (integer, default = 1)
+    - Nilai minimum: `1`
+    - Contoh: `1` berarti halaman pertama, `2` berarti halaman kedua, dan seterusnya.
+- `size`: Menentukan jumlah data yang akan ditampilkan per halaman. (integer, default = 10)
+    - Nilai minimum: `1`
+    - Contoh: `10` berarti setiap halaman akan berisi maksimal 10 data.
+
 ### Response
 
 **Status Code:** `200 OK`
@@ -138,7 +160,13 @@ Mendapatkan daftar pengguna yang di-follow oleh user tersebut.
       "name": "Nama User",
       "profilePicture": "http://example.com"
     }
-  ]
+  ],
+  "pageInfo": {
+    "size": 10,
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalElements": 1
+  }
 }
 ```
 

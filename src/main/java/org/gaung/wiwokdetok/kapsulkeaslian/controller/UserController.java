@@ -4,27 +4,34 @@ import jakarta.validation.Valid;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdateUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserPrincipal;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserProfileResponse;
+import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserRankingResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.CurrentUser;
+import org.gaung.wiwokdetok.kapsulkeaslian.service.PointService;
 import org.gaung.wiwokdetok.kapsulkeaslian.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    private final PointService pointService;
+
+    public UserController(UserService userService, PointService pointService) {
+        this.userService = userService;
+        this.pointService = pointService;
+    }
 
     @AllowedRoles({"USER"})
     @PatchMapping(
@@ -46,13 +53,13 @@ public class UserController {
     }
 
     @GetMapping(
-            path = "/users/{id}",
+            path = "/users/{userId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<UserProfileResponse>> userProfile(
-            @PathVariable("id") String id) {
+            @PathVariable("userId") UUID userId) {
 
-        UserProfileResponse userProfile = userService.getUserProfile(id);
+        UserProfileResponse userProfile = userService.getUserProfile(userId);
 
         WebResponse<UserProfileResponse> response = WebResponse.<UserProfileResponse>builder()
                 .data(userProfile)
@@ -61,25 +68,17 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @AllowedRoles({"USER"})
-    @PostMapping(
-            path = "/users/me/points",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
+    @GetMapping(
+            path = "/rank",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<WebResponse<String>> addPointsToCurrentUser(
-            @CurrentUser UserPrincipal user,
-            @RequestBody Map<String, Integer> request) {
+    public ResponseEntity<WebResponse<List<UserRankingResponse>>> getUserRanking() {
+        List<UserRankingResponse> rankings = pointService.getUserRanking();
 
-        int pointsToAdd = request.get("points");
-
-        userService.addPoints(user.getId(), pointsToAdd);
-
-        WebResponse<String> response = WebResponse.<String>builder()
-                .data("Points added successfully")
+        WebResponse<List<UserRankingResponse>> response = WebResponse.<List<UserRankingResponse>>builder()
+                .data(rankings)
                 .build();
 
         return ResponseEntity.ok(response);
     }
-
 }
