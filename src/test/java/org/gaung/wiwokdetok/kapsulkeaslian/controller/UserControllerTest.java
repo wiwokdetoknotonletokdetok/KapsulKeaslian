@@ -197,7 +197,7 @@ public class UserControllerTest {
             WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNull(response.getData());
-            assertNotNull(response.getErrors());;
+            assertNotNull(response.getErrors());
         });
     }
 
@@ -221,7 +221,7 @@ public class UserControllerTest {
             WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNull(response.getData());
-            assertNotNull(response.getErrors());;
+            assertNotNull(response.getErrors());
         });
     }
 
@@ -241,7 +241,7 @@ public class UserControllerTest {
             WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNull(response.getData());
-            assertNotNull(response.getErrors());;
+            assertNotNull(response.getErrors());
         });
     }
 
@@ -261,7 +261,7 @@ public class UserControllerTest {
             WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNull(response.getData());
-            assertNotNull(response.getErrors());;
+            assertNotNull(response.getErrors());
         });
     }
 
@@ -277,7 +277,7 @@ public class UserControllerTest {
             WebResponse<UserProfileResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNotNull(response.getData());
-            assertNull(response.getErrors());;
+            assertNull(response.getErrors());
         });
     }
 
@@ -298,7 +298,7 @@ public class UserControllerTest {
             WebResponse<UserProfileResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNotNull(response.getData());
-            assertNull(response.getErrors());;
+            assertNull(response.getErrors());
         });
     }
 
@@ -318,7 +318,7 @@ public class UserControllerTest {
             WebResponse<UserProfileResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNotNull(response.getData());
-            assertNull(response.getErrors());;
+            assertNull(response.getErrors());
         });
     }
 
@@ -334,7 +334,7 @@ public class UserControllerTest {
             WebResponse<UserProfileResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNull(response.getData());
-            assertNotNull(response.getErrors());;
+            assertNotNull(response.getErrors());
         });
     }
 
@@ -355,7 +355,7 @@ public class UserControllerTest {
             WebResponse<UserProfileResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNull(response.getData());
-            assertNotNull(response.getErrors());;
+            assertNotNull(response.getErrors());
         });
     }
 }
