@@ -34,5 +34,11 @@ jobs:
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
 
-      - name: Run unit tests with H2 profile
-        run: ./gradlew test
+      - name: Run tests and generate coverage report
+        run: ./gradlew test jacocoTestReport
+
+      - name: Upload code coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/test/jacocoTestReport.xml
