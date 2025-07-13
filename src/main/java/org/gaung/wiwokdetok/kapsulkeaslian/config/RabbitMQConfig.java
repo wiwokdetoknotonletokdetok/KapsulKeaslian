@@ -1,6 +1,7 @@
 package org.gaung.wiwokdetok.kapsulkeaslian.config;
 
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +11,13 @@ public class RabbitMQConfig {
 
     public static final String QUEUE_BOOK_ADDED = "book.added";
 
-    public static final String QUEUE_REVIEW_ADDED = "review.added";
+    public static final String QUEUE_BOOK_REVIEW_ADDED = "book.review.added";
+
+    public static final String QUEUE_BOOK_LOCATION_ADDED = "book.location.added";
+
+    private Queue createQueue(String name) {
+        return QueueBuilder.durable(name).build();
+    }
 
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
@@ -19,11 +26,16 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue bookAddedQueue() {
-        return new Queue(QUEUE_BOOK_ADDED, true);
+        return createQueue(QUEUE_BOOK_ADDED);
     }
 
     @Bean
-    public Queue reviewAddedQueue() {
-        return new Queue(QUEUE_REVIEW_ADDED, true);
+    public Queue bookReviewAddedQueue() {
+        return createQueue(QUEUE_BOOK_REVIEW_ADDED);
+    }
+
+    @Bean
+    public Queue bookLocationAddedQueue() {
+        return createQueue(QUEUE_BOOK_LOCATION_ADDED);
     }
 }
