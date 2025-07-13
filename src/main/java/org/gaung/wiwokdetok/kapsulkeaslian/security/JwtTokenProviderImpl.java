@@ -23,7 +23,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 
     private SecretKey key;
 
-    private final long expiration = 1000 * 60 * 60 * 24 * 7;
+    private static final long expiration = (long) 1000 * 60 * 60 * 24;
 
     @PostConstruct
     public void init() {
