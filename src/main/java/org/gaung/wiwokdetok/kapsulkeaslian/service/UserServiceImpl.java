@@ -30,10 +30,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateEmailChange(User user, String newEmail) {
-        if (!user.getEmail().equals(newEmail)) {
-            if (userRepository.findByEmail(newEmail).isPresent()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email sudah terdaftar");
-            }
+        if (!user.getEmail().equals(newEmail) && userRepository.findByEmail(newEmail).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email sudah terdaftar");
         }
     }
 
