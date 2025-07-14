@@ -23,7 +23,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 
     private SecretKey key;
 
-    private static final long expiration = (long) 1000 * 60 * 60 * 24;
+    private static final long EXPIRATION = (long) 1000 * 60 * 60 * 24;
 
     @PostConstruct
     public void init() {
@@ -35,7 +35,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
                 .setSubject(String.valueOf(id))
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
