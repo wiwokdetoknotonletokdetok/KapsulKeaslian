@@ -15,7 +15,7 @@ public class BookLocationListener {
         this.pointService = pointService;
     }
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_BOOK_REVIEW_ADDED)
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_BOOK_LOCATION_ADDED)
     public void listenBookLocationAddedPoints(AmqpBookLocationMessage message) {
         pointService.addPoints(message.getCreatedBy(), 1);
     }
