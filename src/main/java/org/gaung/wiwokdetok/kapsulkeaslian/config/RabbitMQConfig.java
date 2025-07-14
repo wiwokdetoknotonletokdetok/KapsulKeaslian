@@ -9,15 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String QUEUE_BOOK_ADDED = "book.added";
-
-    public static final String QUEUE_BOOK_REVIEW_ADDED = "book.review.added";
-
-    public static final String QUEUE_BOOK_LOCATION_ADDED = "book.location.added";
-
-    private Queue createQueue(String name) {
-        return QueueBuilder.durable(name).build();
-    }
+    public static final String QUEUE_USER_POINTS = "kapsulkeaslian.points.queue";
 
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
@@ -25,17 +17,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue bookAddedQueue() {
-        return createQueue(QUEUE_BOOK_ADDED);
-    }
-
-    @Bean
-    public Queue bookReviewAddedQueue() {
-        return createQueue(QUEUE_BOOK_REVIEW_ADDED);
-    }
-
-    @Bean
-    public Queue bookLocationAddedQueue() {
-        return createQueue(QUEUE_BOOK_LOCATION_ADDED);
+    public Queue bookQueue() {
+        return QueueBuilder.durable(QUEUE_USER_POINTS).build();
     }
 }
