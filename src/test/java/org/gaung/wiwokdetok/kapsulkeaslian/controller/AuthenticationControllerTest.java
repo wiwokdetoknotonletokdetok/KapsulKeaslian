@@ -55,7 +55,7 @@ public class AuthenticationControllerTest {
 
     @BeforeEach
     void setUp() {
-        String password = "password";
+        String password = "password1";
 
         user = new User();
         user.setEmail("test@wiwokdetok.org");
@@ -173,7 +173,7 @@ public class AuthenticationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerUserRequest))
         ).andExpectAll(
-                status().isBadRequest()
+                status().isConflict()
         ).andDo(result -> {
             WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
@@ -309,8 +309,8 @@ public class AuthenticationControllerTest {
 
         UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest();
         updatePasswordRequest.setCurrentPassword(user.getPassword());
-        updatePasswordRequest.setNewPassword("new" + user.getPassword());
-        updatePasswordRequest.setConfirmNewPassword("new" + user.getPassword());
+        updatePasswordRequest.setNewPassword("new1" + user.getPassword());
+        updatePasswordRequest.setConfirmNewPassword("new1" + user.getPassword());
 
         mockMvc.perform(
                 patch("/auth/password")
@@ -332,8 +332,8 @@ public class AuthenticationControllerTest {
     void testUpdatePasswordFailedWhenTokenIsNull() throws Exception {
         UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest();
         updatePasswordRequest.setCurrentPassword(user.getPassword());
-        updatePasswordRequest.setNewPassword("new" + user.getPassword());
-        updatePasswordRequest.setConfirmNewPassword("new" + user.getPassword());
+        updatePasswordRequest.setNewPassword("new1" + user.getPassword());
+        updatePasswordRequest.setConfirmNewPassword("new1" + user.getPassword());
 
         mockMvc.perform(
                 patch("/auth/password")
@@ -357,8 +357,8 @@ public class AuthenticationControllerTest {
 
         UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest();
         updatePasswordRequest.setCurrentPassword(user.getPassword());
-        updatePasswordRequest.setNewPassword("new" + user.getPassword());
-        updatePasswordRequest.setConfirmNewPassword("new" + user.getPassword());
+        updatePasswordRequest.setNewPassword("new1" + user.getPassword());
+        updatePasswordRequest.setConfirmNewPassword("new1" + user.getPassword());
 
         mockMvc.perform(
                 patch("/auth/password")
@@ -385,8 +385,8 @@ public class AuthenticationControllerTest {
 
         UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest();
         updatePasswordRequest.setCurrentPassword("IncorrectPassword");
-        updatePasswordRequest.setNewPassword("new" + user.getPassword());
-        updatePasswordRequest.setConfirmNewPassword("new" + user.getPassword());
+        updatePasswordRequest.setNewPassword("new1" + user.getPassword());
+        updatePasswordRequest.setConfirmNewPassword("new1" + user.getPassword());
 
         mockMvc.perform(
                 patch("/auth/password")
