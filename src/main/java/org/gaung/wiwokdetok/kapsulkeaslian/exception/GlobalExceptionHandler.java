@@ -9,6 +9,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
@@ -71,6 +72,20 @@ public class GlobalExceptionHandler {
 
         WebResponse<Object> response = WebResponse.builder()
                 .errors(errors)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<WebResponse<Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String parameterName = ex.getName();
+        String expectedType = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "tipe yang sesuai";
+
+        String message = String.format("Parameter '%s' harus berupa %s.", parameterName, expectedType);
+
+        WebResponse<Object> response = WebResponse.builder()
+                .errors(message)
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
