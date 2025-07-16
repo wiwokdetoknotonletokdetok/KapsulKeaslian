@@ -15,8 +15,12 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class ProfilePictureRequest {
 
-    @NotNull
-    @ValidImageMimeType
-    @ImageMinSize(minWidth = 320, minHeight = 320)
+    @NotNull(message = "Silakan unggah foto profil terlebih dahulu.")
+    @ValidImageMimeType(message = "Ukuran gambar terlalu kecil. Minimal 320x320 piksel.")
+    @ImageMinSize(
+            minWidth = 320,
+            minHeight = 320,
+            message = "Format gambar tidak didukung. Gunakan JPG, PNG, atau WEBP."
+    )
     private MultipartFile profilePicture;
 }

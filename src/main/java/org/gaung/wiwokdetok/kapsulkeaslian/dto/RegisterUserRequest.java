@@ -14,20 +14,35 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RegisterUserRequest {
 
-    @NotBlank
-    @Size(max = 254, message = "Email maksimum 254 karakter")
-    @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", message = "Format email tidak valid")
+    @NotBlank(message = "Email tidak boleh kosong.")
+    @Size(max = 254, message = "Email tidak boleh lebih dari 254 karakter.")
+    @Pattern(
+            regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$",
+            message = "Format email tidak valid."
+    )
     private String email;
 
-    @NotBlank
-    @Size(min = 8, max = 72, message = "Password harus antara 8 hingga 72 karakter")
+    @NotBlank(message = "Kata sandi tidak boleh kosong.")
+    @Size(
+            min = 8,
+            max = 72,
+            message = "Kata sandi harus antara 8 hingga 72 karakter."
+    )
+    @Pattern(
+            regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@#$%^&+=!_-]+$",
+            message = "Kata sandi hanya boleh berisi huruf, angka, dan simbol @#$%^&+=!_- dengan minimal satu huruf dan satu angka."
+    )
     private String password;
 
-    @NotBlank
-    @Size(min = 8, max = 72, message = "Password harus antara 8 hingga 72 karakter")
+    @NotBlank(message = "Konfirmasi kata sandi tidak boleh kosong.")
+    @Size(
+            min = 8,
+            max = 72,
+            message = "Konfirmasi kata sandi harus antara 8 hingga 72 karakter."
+    )
     private String confirmPassword;
 
-    @NotBlank
-    @Size(max = 50, message = "Nama maksimum 50 karakter")
+    @NotBlank(message = "Nama tidak boleh kosong.")
+    @Size(max = 50, message = "Nama tidak boleh lebih dari 50 karakter.")
     private String name;
 }

@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginUserRequest {
 
-    @NotBlank(message = "Email tidak boleh kosong")
+    @NotBlank(message = "Email tidak boleh kosong.")
     private String email;
 
-    @NotBlank(message = "Password tidak boleh kosong")
+    @NotBlank(message = "Kata sandi tidak boleh kosong.")
     private String password;
 }
