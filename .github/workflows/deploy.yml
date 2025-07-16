@@ -46,7 +46,7 @@ jobs:
       - name: Prepare deploy files
         run: |
           mkdir kapsulkeaslian
-          mv kapsulkeaslian.tar .env kapsulkeaslian/
+          mv kapsulkeaslian.tar .env docker-compose.yml kapsulkeaslian/
 
       - name: Copy Docker image and .env to server
         uses: appleboy/scp-action@v0.1.4
