@@ -65,7 +65,11 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ~/kapsulkeaslian 
+            
             docker-compose down || true
             docker rmi kapsulkeaslian:latest || true
+            
             docker load -i kapsulkeaslian.tar
+            rm kapsulkeaslian.tar
+            
             docker-compose up -d
