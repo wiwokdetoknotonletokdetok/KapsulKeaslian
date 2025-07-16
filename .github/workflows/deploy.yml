@@ -64,16 +64,8 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd ~/kapsulkeaslian
-            
-            docker stop kapsulkeaslian || true
-            docker rm kapsulkeaslian || true
+            cd ~/kapsulkeaslian 
+            docker-compose down || true
             docker rmi kapsulkeaslian:latest || true
-            
             docker load -i kapsulkeaslian.tar
-            
-            docker run -d \
-              --name kapsulkeaslian \
-              --env-file ~/kapsulkeaslian/.env \
-              -p 8080:8080 \
-              kapsulkeaslian:latest
+            docker-compose up -d
