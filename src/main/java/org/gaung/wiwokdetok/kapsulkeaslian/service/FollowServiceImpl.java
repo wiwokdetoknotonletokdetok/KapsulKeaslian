@@ -30,11 +30,11 @@ public class FollowServiceImpl implements FollowService {
         User toUser = userService.getUserById(toUserId);
 
         if (fromUser.equals(toUser)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tidak dapat mengikuti diri sendiri");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Anda tidak dapat mengikuti diri sendiri.");
         }
 
         if (followRepository.existsByFollowerAndFollowing(fromUser, toUser)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sudah mengikuti pengguna ini");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Anda sudah mengikuti pengguna ini.");
         }
 
         Follow follow = new Follow(fromUser, toUser);
@@ -49,7 +49,7 @@ public class FollowServiceImpl implements FollowService {
         User toUser = userService.getUserById(toUserId);
 
         if (!followRepository.existsByFollowerAndFollowing(fromUser, toUser)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Belum mengikuti pengguna ini");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Anda belum mengikuti pengguna ini.");
         }
 
         followRepository.deleteByFollowerAndFollowing(fromUser, toUser);

@@ -59,7 +59,7 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
 
             return profilePictureUrl;
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Gagal upload profile picture");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Terjadi kesalahan saat memproses file gambar.");
         }
     }
 

@@ -39,7 +39,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private User getUserByEmailAndPassword(String email, String password) {
-        String message = "Username atau password tidak valid";
+        String message = "Email atau kata sandi salah.";
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, message));
@@ -60,13 +60,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private void checkEmailExists(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email sudah terdaftar");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email sudah terdaftar.");
         }
     }
 
     private void validatePasswordConfirm(String password, String confirmPassword) {
         if (!password.equals(confirmPassword)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password tidak cocok");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kata sandi dan konfirmasi tidak cocok.");
         }
     }
 
@@ -79,7 +79,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void updateUserPassword(UUID userId, UpdatePasswordRequest request) {
         User user = userService.getUserById(userId);
 
-        validatePassword(user, request.getCurrentPassword(), "Password tidak valid");
+        validatePassword(user, request.getCurrentPassword(), "Kata sandi saat ini tidak valid.");
 
         validatePasswordConfirm(request.getNewPassword(), request.getConfirmNewPassword());
 
@@ -96,7 +96,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private void validateNewPassword(String currentPassword, String newPassword) {
         if (currentPassword.equals(newPassword)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password baru identik dengan yang lama");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kata sandi baru dan konfirmasi tidak cocok.");
         }
     }
 

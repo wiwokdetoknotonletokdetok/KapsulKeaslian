@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     private void validateEmailChange(User user, String newEmail) {
         if (!user.getEmail().equals(newEmail) && userRepository.findByEmail(newEmail).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email sudah terdaftar");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email sudah terdaftar.");
         }
     }
 
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pengguna tidak ditemukan."));
     }
 
     private UserProfileResponse mapToUserProfileResponse(User user) {
