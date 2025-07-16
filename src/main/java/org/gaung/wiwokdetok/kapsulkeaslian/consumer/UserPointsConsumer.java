@@ -7,11 +7,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserPointsListener {
+public class UserPointsConsumer {
 
     private final PointService pointService;
 
-    public UserPointsListener(PointService pointService) {
+    public UserPointsConsumer(PointService pointService) {
         this.pointService = pointService;
     }
 
