@@ -7,12 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.gaung.wiwokdetok.kapsulkeaslian.validation.PasswordsMatch;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterUserRequest {
+@PasswordsMatch
+public class RegisterUserRequest implements PasswordConfirmation {
 
     @NotBlank(message = "Email tidak boleh kosong.")
     @Size(max = 254, message = "Email tidak boleh lebih dari 254 karakter.")

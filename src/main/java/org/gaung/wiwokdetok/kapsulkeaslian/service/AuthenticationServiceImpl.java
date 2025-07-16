@@ -52,21 +52,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void registerUser(RegisterUserRequest request) {
         checkEmailExists(request.getEmail());
-
-        validatePasswordConfirm(request.getPassword(), request.getConfirmPassword());
-
         saveUser(request);
     }
 
     private void checkEmailExists(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email sudah terdaftar.");
-        }
-    }
-
-    private void validatePasswordConfirm(String password, String confirmPassword) {
-        if (!password.equals(confirmPassword)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kata sandi dan konfirmasi tidak cocok.");
         }
     }
 
@@ -81,22 +72,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         validatePassword(user, request.getCurrentPassword(), "Kata sandi saat ini tidak valid.");
 
-        validatePasswordConfirm(request.getNewPassword(), request.getConfirmNewPassword());
-
-        validateNewPassword(request.getCurrentPassword(), request.getNewPassword());
-
         updatePassword(user, request.getNewPassword());
     }
 
     private void validatePassword(User user, String currentPassword, String message) {
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, message);
-        }
-    }
-
-    private void validateNewPassword(String currentPassword, String newPassword) {
-        if (currentPassword.equals(newPassword)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kata sandi baru dan konfirmasi tidak cocok.");
         }
     }
 
