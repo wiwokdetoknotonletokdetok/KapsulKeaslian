@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserFactory {
 
-    @Value("${CLOUDFLARE_R2_PUBLIC_ENDPOINT}")
+    @Value("${cloudflare.r2.public-endpoint}")
     private String publicEndpoint;
 
     private final PasswordEncoder passwordEncoder;

@@ -24,10 +24,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProfilePictureServiceImpl implements ProfilePictureService {
 
-    @Value("${CLOUDFLARE_R2_BUCKET_NAME}")
+    @Value("${cloudflare.r2.bucket-name}")
     private String bucketName;
 
-    @Value("${CLOUDFLARE_R2_PUBLIC_ENDPOINT}")
+    @Value("${cloudflare.r2.public-endpoint}")
     private String publicEndpoint;
 
     private final UserRepository userRepository;

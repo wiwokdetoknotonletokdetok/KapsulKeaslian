@@ -16,13 +16,12 @@ class JwtTokenProviderImplTest {
 
     private JwtTokenProviderImpl jwtTokenProvider;
 
-    private final String secretKey = "supersecretkeysupersecretkey123456";
-
     @BeforeEach
     void setUp() {
         jwtTokenProvider = new JwtTokenProviderImpl();
 
-        ReflectionTestUtils.setField(jwtTokenProvider, "secret", secretKey);
+        ReflectionTestUtils.setField(jwtTokenProvider, "secret", "supersecretkeysupersecretkey123456");
+        ReflectionTestUtils.setField(jwtTokenProvider, "expiration", 3600000L);
         jwtTokenProvider.init();
     }
 

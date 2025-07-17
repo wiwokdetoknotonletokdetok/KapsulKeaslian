@@ -18,12 +18,13 @@ import java.util.UUID;
 @Component
 public class JwtTokenProviderImpl implements JwtTokenProvider {
 
-    @Value("${JWT_SECRET}")
+    @Value("${jwt.secret}")
     private String secret;
 
-    private SecretKey key;
+    @Value("${jwt.expiration-ms}")
+    private long expiration;
 
-    private static final long EXPIRATION = (long) 1000 * 60 * 60 * 24;
+    private SecretKey key;
 
     @PostConstruct
     public void init() {
@@ -35,7 +36,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
                 .setSubject(String.valueOf(id))
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
