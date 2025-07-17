@@ -10,13 +10,14 @@ import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.AllowedRoles;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.annotation.CurrentUser;
 import org.gaung.wiwokdetok.kapsulkeaslian.service.AuthenticationService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
 
 @RestController
 public class AuthenticationController {
@@ -52,13 +53,13 @@ public class AuthenticationController {
     public ResponseEntity<WebResponse<String>> register(
             @Valid @RequestBody RegisterUserRequest request) {
 
-        authenticationService.registerUser(request);
+        String userUrl = authenticationService.registerUser(request);
 
         WebResponse<String> response = WebResponse.<String>builder()
-                .data("OK")
+                .data("Created")
                 .build();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.created(URI.create(userUrl)).body(response);
     }
 
     @AllowedRoles({"USER"})

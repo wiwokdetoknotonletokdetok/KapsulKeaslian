@@ -10,7 +10,7 @@ public interface AuthenticationService {
 
     LoginUserResponse authenticate(String username, String password);
 
-    void registerUser(RegisterUserRequest request);
+    String registerUser(RegisterUserRequest request);
 
     void updateUserPassword(UUID userId, UpdatePasswordRequest request);
 }

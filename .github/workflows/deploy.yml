@@ -44,6 +44,7 @@ jobs:
           RABBITMQ_PASS=${{ secrets.RABBITMQ_PASS }}
           CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
           CORS_ALLOWED_HEADERS=${{ secrets.CORS_ALLOWED_HEADERS }}
+          APPLICATION_BASE_URL=${{ secrets.APPLICATION_BASE_URL }}
           EOF
 
       - name: Prepare deploy files

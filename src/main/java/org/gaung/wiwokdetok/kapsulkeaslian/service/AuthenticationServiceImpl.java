@@ -8,6 +8,7 @@ import org.gaung.wiwokdetok.kapsulkeaslian.factory.UserFactory;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${application.base-url}")
+    private String applicationBaseUrl;
 
     @Override
     public LoginUserResponse authenticate(String email, String password) {
@@ -50,9 +54,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void registerUser(RegisterUserRequest request) {
+    public String registerUser(RegisterUserRequest request) {
         checkEmailExists(request.getEmail());
-        saveUser(request);
+        return saveUser(request);
     }
 
     private void checkEmailExists(String email) {
@@ -61,9 +65,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-    private void saveUser(RegisterUserRequest request) {
+    private String saveUser(RegisterUserRequest request) {
         User user = userFactory.createUser(request);
         userRepository.save(user);
+
+        return String.format("%s/users/%s", applicationBaseUrl, user.getId());
     }
 
     @Override
