@@ -41,6 +41,8 @@ jobs:
           RABBITMQ_PORT=${{ secrets.RABBITMQ_PORT }}
           RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}
           RABBITMQ_PASS=${{ secrets.RABBITMQ_PASS }}
+          CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
+          CORS_ALLOWED_HEADERS=${{ secrets.CORS_ALLOWED_HEADERS }}
           EOF
 
       - name: Prepare deploy files
