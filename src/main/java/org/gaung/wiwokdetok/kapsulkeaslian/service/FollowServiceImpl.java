@@ -24,6 +24,15 @@ public class FollowServiceImpl implements FollowService {
     private final FollowRepository followRepository;
 
     @Override
+    public boolean followStatus(UUID fromUserId, UUID toUserId) {
+        User fromUser = userService.getUserById(fromUserId);
+
+        User toUser = userService.getUserById(toUserId);
+
+        return followRepository.existsByFollowerAndFollowing(fromUser, toUser);
+    }
+
+    @Override
     public void followUser(UUID fromUserId, UUID toUserId) {
         User fromUser = userService.getUserById(fromUserId);
 

@@ -31,6 +31,26 @@ public class FollowController {
     private final PaginationValidator paginationValidator;
 
     @AllowedRoles({"USER"})
+    @GetMapping(
+            path = "/users/{userId}/follow/status",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<WebResponse<Boolean>> followStatus(
+            @CurrentUser UserPrincipal user,
+            @PathVariable("userId") UUID userId) {
+
+        boolean status = followService.followStatus(user.getId(), userId);
+
+        WebResponse<Boolean> response = WebResponse.<Boolean>builder()
+                .data(status)
+                .build();
+
+        return ResponseEntity.ok(response);
+
+    }
+
+
+    @AllowedRoles({"USER"})
     @PostMapping(
             path = "/users/{userId}/follow",
             produces = MediaType.APPLICATION_JSON_VALUE

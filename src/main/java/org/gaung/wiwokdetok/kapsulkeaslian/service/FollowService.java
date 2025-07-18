@@ -7,6 +7,8 @@ import java.util.UUID;
 
 public interface FollowService {
 
+    boolean followStatus(UUID fromUserId, UUID toUserId);
+
     void followUser(UUID fromUserId, UUID toUserId);
 
     void unfollowUser(UUID fromUserId, UUID toUserId);
