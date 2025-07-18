@@ -26,8 +26,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -88,6 +90,75 @@ public class FollowControllerTest {
     void tearDown() {
         followRepository.deleteAll();
         userRepository.deleteAll();
+    }
+
+    @Test
+    void testFollowStatusTrue() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
+
+        Follow follow = new Follow(user, user2);
+        followRepository.save(follow);
+
+        mockMvc.perform(
+                get("/users/{id}/follow/status", user2.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer valid.token.here")
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<Boolean> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertTrue(response.getData());
+            assertNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void testFollowStatusFalse() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user.getRole());
+
+        mockMvc.perform(
+                get("/users/{id}/follow/status", user2.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer valid.token.here")
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<Boolean> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertFalse(response.getData());
+            assertNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void testFollowStatusFalse_whenUserFollowsUser2() throws Exception {
+        Claims payload = mock(Claims.class);
+        when(jwtTokenProvider.decodeToken("valid.token.here")).thenReturn(payload);
+        when(jwtTokenProvider.getId(payload)).thenReturn(String.valueOf(user2.getId()));
+        when(jwtTokenProvider.getRole(payload)).thenReturn(user2.getRole());
+
+        Follow follow = new Follow(user, user2);
+        followRepository.save(follow);
+
+        mockMvc.perform(
+                get("/users/{id}/follow/status", user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer valid.token.here")
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<Boolean> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertFalse(response.getData());
+            assertNull(response.getErrors());
+        });
     }
 
     @Test
