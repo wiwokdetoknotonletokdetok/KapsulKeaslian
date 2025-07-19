@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+import org.gaung.wiwokdetok.kapsulkeaslian.dto.AmqpUserRegisteredMessage;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.LoginUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.LoginUserResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.RegisterUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdatePasswordRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
+import org.gaung.wiwokdetok.kapsulkeaslian.publisher.UserRegisteredPublisher;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
 import org.junit.jupiter.api.AfterEach;
@@ -26,6 +28,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -42,6 +46,9 @@ public class AuthenticationControllerTest {
 
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private UserRegisteredPublisher userRegisteredPublisher;
 
     @Autowired
     private UserRepository userRepository;
@@ -144,6 +151,8 @@ public class AuthenticationControllerTest {
         registerUserRequest.setPassword(user.getPassword());
         registerUserRequest.setConfirmPassword(user.getPassword());
         registerUserRequest.setName("Test User");
+
+        doNothing().when(userRegisteredPublisher).sendUserRegisteredMessage(any(AmqpUserRegisteredMessage.class));
 
         mockMvc.perform(
                 post("/auth/register")
