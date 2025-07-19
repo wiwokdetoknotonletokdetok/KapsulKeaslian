@@ -7,7 +7,7 @@ import org.gaung.wiwokdetok.kapsulkeaslian.dto.RegisterUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdatePasswordRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.factory.UserFactory;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
-import org.gaung.wiwokdetok.kapsulkeaslian.publisher.UserRegisteredPublisher;
+import org.gaung.wiwokdetok.kapsulkeaslian.publisher.UserActivityPublisher;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final UserRegisteredPublisher userRegisteredPublisher;
+    private final UserActivityPublisher userActivityPublisher;
 
     @Value("${application.base-url}")
     private String applicationBaseUrl;
@@ -68,7 +68,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private void sendUserRegisteredMessage(User user) {
         AmqpUserRegisteredMessage message = new AmqpUserRegisteredMessage(user.getId());
-        userRegisteredPublisher.sendUserRegisteredMessage(message);
+        userActivityPublisher.sendUserRegisteredMessage(message);
     }
 
     private void checkEmailExists(String email) {

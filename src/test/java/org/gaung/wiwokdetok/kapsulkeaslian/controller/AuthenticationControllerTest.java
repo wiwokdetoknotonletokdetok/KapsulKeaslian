@@ -11,7 +11,7 @@ import org.gaung.wiwokdetok.kapsulkeaslian.dto.RegisterUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdatePasswordRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
-import org.gaung.wiwokdetok.kapsulkeaslian.publisher.UserRegisteredPublisher;
+import org.gaung.wiwokdetok.kapsulkeaslian.publisher.UserActivityPublisher;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
 import org.gaung.wiwokdetok.kapsulkeaslian.security.JwtTokenProvider;
 import org.junit.jupiter.api.AfterEach;
@@ -48,7 +48,7 @@ public class AuthenticationControllerTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @MockBean
-    private UserRegisteredPublisher userRegisteredPublisher;
+    private UserActivityPublisher userActivityPublisher;
 
     @Autowired
     private UserRepository userRepository;
@@ -152,7 +152,7 @@ public class AuthenticationControllerTest {
         registerUserRequest.setConfirmPassword(user.getPassword());
         registerUserRequest.setName("Test User");
 
-        doNothing().when(userRegisteredPublisher).sendUserRegisteredMessage(any(AmqpUserRegisteredMessage.class));
+        doNothing().when(userActivityPublisher).sendUserRegisteredMessage(any(AmqpUserRegisteredMessage.class));
 
         mockMvc.perform(
                 post("/auth/register")

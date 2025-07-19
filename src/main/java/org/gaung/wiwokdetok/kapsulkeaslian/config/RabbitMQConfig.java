@@ -2,6 +2,7 @@ package org.gaung.wiwokdetok.kapsulkeaslian.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
@@ -14,11 +15,11 @@ public class RabbitMQConfig {
 
     public static final String EXCHANGE_NAME = "wiwokdetok.exchange";
 
-    public static final String QUEUE_USER_POINTS = "kapsulkeaslian.points.queue";
+    public static final String QUEUE_USER_POINTS = "kapsulkeaslian.user.points.queue";
 
-    public static final String QUEUE_USER = "pustakacerdas.user.queue";
+    public static final String QUEUE_USER_ACTIVITY = "pustakacerdas.user.activity.queue";
 
-    public static final String ROUTING_KEY_USER_REGISTERED = "user.registered";
+    public static final String ROUTING_KEY_USER_ACTIVITY_REGISTERED = "user.activity.registered";
 
     private Queue createQueue(String name) {
         return QueueBuilder.durable(name).build();
@@ -31,7 +32,7 @@ public class RabbitMQConfig {
 
     @Bean
     public TopicExchange exchange() {
-        return new TopicExchange(EXCHANGE_NAME);
+        return ExchangeBuilder.topicExchange(EXCHANGE_NAME).durable(true).build();
     }
 
     @Bean
@@ -40,12 +41,12 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue userQueue() {
-        return createQueue(QUEUE_USER);
+    public Queue userActivityQueue() {
+        return createQueue(QUEUE_USER_ACTIVITY);
     }
 
     @Bean
-    public Binding bindingUserRegistered(Queue userQueue, TopicExchange exchange) {
-        return BindingBuilder.bind(userQueue).to(exchange).with(ROUTING_KEY_USER_REGISTERED);
+    public Binding bindingUserRegistered(Queue userActivityQueue, TopicExchange exchange) {
+        return BindingBuilder.bind(userActivityQueue).to(exchange).with(ROUTING_KEY_USER_ACTIVITY_REGISTERED);
     }
 }
