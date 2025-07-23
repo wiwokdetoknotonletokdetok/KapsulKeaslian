@@ -37,7 +37,13 @@ public class PointServiceImpl implements PointService {
         List<User> users = userRepository.findAll(Sort.by(Sort.Direction.DESC, "points"));
 
         return users.stream()
-                .map(user -> new UserRankingResponse(user.getEmail().toString(), user.getName(), user.getPoints()))
+                .map(user -> UserRankingResponse.builder()
+                        .id(user.getId())
+                        .profilePicture(user.getProfilePicture())
+                        .name(user.getName())
+                        .points(user.getPoints())
+                        .build())
                 .collect(Collectors.toList());
     }
+
 }
