@@ -7,6 +7,8 @@ import lombok.Builder;
 
 import java.util.UUID;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,8 +16,13 @@ import java.util.UUID;
 public class UserRankingResponse {
 
     private UUID id;
-    private String profilePicture;
+  
+    private String email;
+
     private String name;
+  
     private int points;
+
+    private String profilePicture;
 }
 

@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UpdateUserRequest;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserProfileResponse;
+import org.gaung.wiwokdetok.kapsulkeaslian.dto.UserRankingResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.dto.WebResponse;
 import org.gaung.wiwokdetok.kapsulkeaslian.model.User;
 import org.gaung.wiwokdetok.kapsulkeaslian.repository.UserRepository;
@@ -21,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -357,5 +359,78 @@ public class UserControllerTest {
             assertNull(response.getData());
             assertNotNull(response.getErrors());
         });
+    }
+
+    @Test
+    void testGetUserRankingSuccess() throws Exception {
+        mockMvc.perform(
+                get("/rank")
+                        .param("page", "1")
+                        .param("size", "10")
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<List<UserRankingResponse>> response = objectMapper.readValue(
+                    result.getResponse().getContentAsString(),
+                    new TypeReference<>() {}
+            );
+
+            assertNotNull(response.getData());
+            assertNull(response.getErrors());
+
+            assertTrue(response.getData().size() <= 10);
+            assertNotNull(response.getPageInfo());
+            assertEquals(1, response.getPageInfo().getCurrentPage());
+        });
+    }
+
+    @Test
+    void testGetUserRankingPageExceedsTotalPages() throws Exception {
+        mockMvc.perform(
+                get("/rank")
+                        .param("page", "999")
+                        .param("size", "10")
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isBadRequest()
+        ).andDo(result -> {
+            WebResponse<?> response = objectMapper.readValue(
+                    result.getResponse().getContentAsString(),
+                    new TypeReference<>() {}
+            );
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+            assertTrue(response.getErrors().contains("Page melebihi jumlah halaman yang tersedia"));
+        });
+    }
+
+    @Test
+    void testGetUserRankingPageMelebihiTotalPages() throws Exception {
+        mockMvc.perform(
+                get("/rank")
+                        .param("page", "2")
+                        .param("size", "2")
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isBadRequest()
+        ).andDo(result -> {
+            WebResponse<?> response = objectMapper.readValue(
+                    result.getResponse().getContentAsString(),
+                    new TypeReference<>() {}
+            );
+            assertNull(response.getData());
+            assertNotNull(response.getErrors());
+            assertTrue(response.getErrors().contains("Page melebihi jumlah halaman yang tersedia"));
+        });
+    }
+
+    @Test
+    void testGetRankingWhenPageIsValidShouldNotThrowError() throws Exception {
+        mockMvc.perform(get("/rank")
+                        .param("page", "1")
+                        .param("size", "2")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }

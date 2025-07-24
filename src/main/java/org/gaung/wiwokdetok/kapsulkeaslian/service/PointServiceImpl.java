@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class PointServiceImpl implements PointService {
@@ -37,13 +36,15 @@ public class PointServiceImpl implements PointService {
         List<User> users = userRepository.findAll(Sort.by(Sort.Direction.DESC, "points"));
 
         return users.stream()
-                .map(user -> UserRankingResponse.builder()
-                        .id(user.getId())
-                        .profilePicture(user.getProfilePicture())
-                        .name(user.getName())
-                        .points(user.getPoints())
-                        .build())
-                .collect(Collectors.toList());
+                .map(user -> new UserRankingResponse(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getName(),
+                        user.getPoints(),
+                        user.getProfilePicture()
+                ))
+                .toList();
+
     }
 
 }
