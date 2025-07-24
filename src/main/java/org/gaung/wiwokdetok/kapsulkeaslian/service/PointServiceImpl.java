@@ -44,6 +44,7 @@ public class PointServiceImpl implements PointService {
                         user.getProfilePicture()
                 ))
                 .toList();
+
     }
 
 }
